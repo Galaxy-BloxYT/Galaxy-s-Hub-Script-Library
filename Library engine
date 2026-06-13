@@ -1,54 +1,40 @@
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-local CoreGui = game:GetService("CoreGui")
-
 local Library = {}
 
 function Library:Init(title)
-    local UI = Instance.new("ScreenGui", CoreGui)
-    UI.Name = "GalaxyLib"
-
-    -- Main Frame (Deitado e moderno)
-    local Main = Instance.new("Frame", UI)
-    Main.Size = UDim2.new(0, 500, 0, 300)
-    Main.Position = UDim2.new(0.5, -250, 0.5, -150)
-    Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
-    Instance.new("UIStroke", Main).Thickness = 2
-    Main.UIStroke.Color = Color3.fromRGB(50, 50, 50)
-
-    -- Sidebar (Onde ficam as Tabs)
-    local Sidebar = Instance.new("Frame", Main)
-    Sidebar.Size = UDim2.new(0, 120, 1, 0)
-    Sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 10)
+    -- ... [Mantém o Main e Sidebar] ...
     
-    local TabContainer = Instance.new("UIListLayout", Sidebar)
-    TabContainer.Padding = UDim.new(0, 5)
-    TabContainer.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-    -- Container de conteúdo (Onde os botões aparecem)
-    local Content = Instance.new("Frame", Main)
-    Content.Position = UDim2.new(0, 130, 0, 10)
-    Content.Size = UDim2.new(1, -140, 1, -20)
-    Content.BackgroundTransparency = 1
+    local TabContentContainer = Instance.new("Frame", Main)
+    TabContentContainer.Position = UDim2.new(0, 130, 0, 10)
+    TabContentContainer.Size = UDim2.new(1, -140, 1, -20)
+    TabContentContainer.BackgroundTransparency = 1
 
     local Window = {}
-    
+
     function Window:CreateTab(name)
-        local btn = Instance.new("TextButton", Sidebar)
-        btn.Size = UDim2.new(0.9, 0, 0, 40)
-        btn.Text = name
-        btn.TextColor3 = Color3.new(1, 1, 1)
-        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        Instance.new("UICorner", btn)
+        -- Botão na Sidebar
+        local tabBtn = Instance.new("TextButton", Sidebar)
+        tabBtn.Size = UDim2.new(0.9, 0, 0, 40)
+        tabBtn.Text = name
+        -- ... [Design do botão] ...
+
+        -- O Frame que vai segurar os elementos dessa aba específica
+        local tabFrame = Instance.new("ScrollingFrame", TabContentContainer)
+        tabFrame.Size = UDim2.new(1, 0, 1, 0)
+        tabFrame.BackgroundTransparency = 1
+        tabFrame.Visible = false -- Começa invisível
         
-        -- Aqui dentro você criaria a lógica de trocar o Container ativo
-        -- Por enquanto, vamos manter a estrutura básica
-        return btn
+        -- Lógica de trocar
+        tabBtn.MouseButton1Click:Connect(function()
+            -- Esconde todas as abas
+            for _, child in pairs(TabContentContainer:GetChildren()) do
+                if child:IsA("ScrollingFrame") then child.Visible = false end
+            end
+            -- Mostra apenas a atual
+            tabFrame.Visible = true
+        end)
+
+        return tabFrame -- Retorna o frame para você adicionar botões dentro
     end
 
     return Window
 end
-
-return Library
