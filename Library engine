@@ -1,5 +1,5 @@
-local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 
 local Library = {}
@@ -8,84 +8,97 @@ function Library:Init(title)
     local UI = Instance.new("ScreenGui", CoreGui)
     UI.Name = "GalaxyLib"
 
+    -- Frame Deitado (Horizontal)
     local Main = Instance.new("Frame", UI)
-    Main.Size = UDim2.new(0, 300, 0, 400)
-    Main.Position = UDim2.new(0.5, -150, 0.5, -200)
-    Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    Main.ClipsDescendants = true
-    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
-
-    local Title = Instance.new("TextLabel", Main)
-    Title.Size = UDim2.new(1, 0, 0, 40)
-    Title.Text = title
-    Title.TextColor3 = Color3.new(1, 1, 1)
-    Title.Font = Enum.Font.GothamBold
-    Title.TextSize = 18
-    Title.BackgroundTransparency = 1
-
-    local Container = Instance.new("ScrollingFrame", Main)
-    Container.Position = UDim2.new(0, 0, 0, 40)
-    Container.Size = UDim2.new(1, 0, 1, -40)
-    Container.BackgroundTransparency = 1
-    Container.ScrollBarThickness = 2
+    Main.Size = UDim2.new(0, 450, 0, 250) 
+    Main.Position = UDim2.new(0.5, -225, 0.5, -125)
+    Main.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
     
-    local List = Instance.new("UIListLayout", Container)
-    List.Padding = UDim.new(0, 5)
-    List.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-    -- Lógica de Toggle (RightControl)
-    UserInputService.InputBegan:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.RightControl then
-            UI.Enabled = not UI.Enabled
+    -- Draggable
+    local dragging, dragInput, dragStart, startPos
+    Main.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = Main.Position
         end
     end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
+
+    -- TopBar (Fechar/Minimizar)
+    local TopBar = Instance.new("Frame", Main)
+    TopBar.Size = UDim2.new(1, 0, 0, 30)
+    TopBar.BackgroundTransparency = 1
+    
+    local CloseBtn = Instance.new("TextButton", TopBar)
+    CloseBtn.Size = UDim2.new(0, 30, 1, 0)
+    CloseBtn.Position = UDim2.new(1, -30, 0, 0)
+    CloseBtn.Text = "X"
+    CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    CloseBtn.MouseButton1Click:Connect(function() UI:Destroy() end)
+    
+    -- Container
+    local Container = Instance.new("ScrollingFrame", Main)
+    Container.Size = UDim2.new(1, -20, 1, -40)
+    Container.Position = UDim2.new(0, 10, 0, 35)
+    Container.BackgroundTransparency = 1
+    
+    local Grid = Instance.new("UIGridLayout", Container)
+    Grid.CellSize = UDim2.new(0, 130, 0, 50)
+    Grid.CellPadding = UDim2.new(0, 10, 0, 10)
 
     local Window = {}
     
-    function Window:AddButton(text, callback)
+    function Window:AddButton(name, callback)
         local btn = Instance.new("TextButton", Container)
-        btn.Size = UDim2.new(0.9, 0, 0, 35)
-        btn.Text = text
-        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        btn.TextColor3 = Color3.new(1, 1, 1)
-        btn.Font = Enum.Font.Gotham
-        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
+        btn.Size = UDim2.new(0, 130, 0, 50)
+        btn.Text = name .. " (Button)"
+        btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        Instance.new("UICorner", btn)
         
-        btn.MouseButton1Click:Connect(callback)
+        btn.MouseButton1Down:Connect(function()
+            btn.Size = UDim2.new(0, 125, 0, 45) -- Efeito afundar
+            callback()
+        end)
+        btn.MouseButton1Up:Connect(function() btn.Size = UDim2.new(0, 130, 0, 50) end)
     end
 
-    function Window:AddSlider(text, min, max, callback)
+    function Window:AddSlider(name, min, max, callback)
         local sliderBase = Instance.new("Frame", Container)
-        sliderBase.Size = UDim2.new(0.9, 0, 0, 45)
-        sliderBase.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        sliderBase.Size = UDim2.new(0, 130, 0, 50)
+        sliderBase.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
         Instance.new("UICorner", sliderBase)
-
-        local label = Instance.new("TextLabel", sliderBase)
-        label.Size = UDim2.new(1, 0, 0.5, 0)
-        label.Text = text
-        label.TextColor3 = Color3.new(1, 1, 1)
-        label.BackgroundTransparency = 1
-
-        local track = Instance.new("Frame", sliderBase)
-        track.Position = UDim2.new(0.05, 0, 0.6, 0)
-        track.Size = UDim2.new(0.9, 0, 0, 6)
-        track.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
         
-        local knob = Instance.new("Frame", track)
-        knob.Size = UDim2.new(0, 10, 1, 0)
-        knob.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+        local valLabel = Instance.new("TextLabel", sliderBase)
+        valLabel.Size = UDim2.new(1, 0, 0.4, 0)
+        valLabel.Text = name .. ": 0"
         
-        -- Lógica simples de slider
-        track.InputBegan:Connect(function(input)
+        local bar = Instance.new("Frame", sliderBase)
+        bar.Size = UDim2.new(0.8, 0, 0, 6)
+        bar.Position = UDim2.new(0.1, 0, 0.6, 0)
+        
+        -- Logic: Clique para setar valor
+        bar.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
                 local mouse = game.Players.LocalPlayer:GetMouse()
-                local pos = math.clamp((mouse.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
-                knob.Size = UDim2.new(pos, 0, 1, 0)
-                callback(math.floor(min + (max - min) * pos))
+                local percent = math.clamp((mouse.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X, 0, 1)
+                local val = math.floor(min + (max - min) * percent)
+                valLabel.Text = name .. ": " .. val
+                callback(val)
             end
         end)
     end
 
+    -- Toggle Menu
+    UserInputService.InputBegan:Connect(function(i) if i.KeyCode == Enum.KeyCode.RightControl then Main.Visible = not Main.Visible end end)
+    
     return Window
 end
 
