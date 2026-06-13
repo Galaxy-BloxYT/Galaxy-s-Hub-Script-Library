@@ -12,7 +12,14 @@ function Library:Init(title)
     local Stroke = Instance.new("UIStroke", Main); Stroke.Color = Color3.fromRGB(50, 50, 50); Stroke.Thickness = 2
     
     local TopBar = Instance.new("Frame", Main); TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
-    
+
+-- Logo abaixo da criação da TopBar:
+local Title = Instance.new("TextLabel", TopBar)
+Title.Size = UDim2.new(1, -80, 1, 0); Title.Position = UDim2.new(0, 10, 0, 0)
+Title.Text = title; Title.TextColor3 = Color3.new(1,1,1); Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14; Title.TextXAlignment = Enum.TextXAlignment.Left; Title.BackgroundTransparency = 1
+
+
     local function CreateTopBtn(text, pos)
         local b = Instance.new("TextButton", TopBar); b.Size = UDim2.new(0, 30, 0, 30); b.Position = pos
         b.Text = text; b.BackgroundTransparency = 1; b.TextColor3 = Color3.new(1,1,1); b.Font = Enum.Font.GothamBold
