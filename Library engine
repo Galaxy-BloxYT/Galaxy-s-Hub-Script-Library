@@ -1,0 +1,92 @@
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+
+local Library = {}
+
+function Library:Init(title)
+    local UI = Instance.new("ScreenGui", CoreGui)
+    UI.Name = "GalaxyLib"
+
+    local Main = Instance.new("Frame", UI)
+    Main.Size = UDim2.new(0, 300, 0, 400)
+    Main.Position = UDim2.new(0.5, -150, 0.5, -200)
+    Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Main.ClipsDescendants = true
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+
+    local Title = Instance.new("TextLabel", Main)
+    Title.Size = UDim2.new(1, 0, 0, 40)
+    Title.Text = title
+    Title.TextColor3 = Color3.new(1, 1, 1)
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 18
+    Title.BackgroundTransparency = 1
+
+    local Container = Instance.new("ScrollingFrame", Main)
+    Container.Position = UDim2.new(0, 0, 0, 40)
+    Container.Size = UDim2.new(1, 0, 1, -40)
+    Container.BackgroundTransparency = 1
+    Container.ScrollBarThickness = 2
+    
+    local List = Instance.new("UIListLayout", Container)
+    List.Padding = UDim.new(0, 5)
+    List.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+    -- Lógica de Toggle (RightControl)
+    UserInputService.InputBegan:Connect(function(input)
+        if input.KeyCode == Enum.KeyCode.RightControl then
+            UI.Enabled = not UI.Enabled
+        end
+    end)
+
+    local Window = {}
+    
+    function Window:AddButton(text, callback)
+        local btn = Instance.new("TextButton", Container)
+        btn.Size = UDim2.new(0.9, 0, 0, 35)
+        btn.Text = text
+        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.Font = Enum.Font.Gotham
+        Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
+        
+        btn.MouseButton1Click:Connect(callback)
+    end
+
+    function Window:AddSlider(text, min, max, callback)
+        local sliderBase = Instance.new("Frame", Container)
+        sliderBase.Size = UDim2.new(0.9, 0, 0, 45)
+        sliderBase.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        Instance.new("UICorner", sliderBase)
+
+        local label = Instance.new("TextLabel", sliderBase)
+        label.Size = UDim2.new(1, 0, 0.5, 0)
+        label.Text = text
+        label.TextColor3 = Color3.new(1, 1, 1)
+        label.BackgroundTransparency = 1
+
+        local track = Instance.new("Frame", sliderBase)
+        track.Position = UDim2.new(0.05, 0, 0.6, 0)
+        track.Size = UDim2.new(0.9, 0, 0, 6)
+        track.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        
+        local knob = Instance.new("Frame", track)
+        knob.Size = UDim2.new(0, 10, 1, 0)
+        knob.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+        
+        -- Lógica simples de slider
+        track.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                local mouse = game.Players.LocalPlayer:GetMouse()
+                local pos = math.clamp((mouse.X - track.AbsolutePosition.X) / track.AbsoluteSize.X, 0, 1)
+                knob.Size = UDim2.new(pos, 0, 1, 0)
+                callback(math.floor(min + (max - min) * pos))
+            end
+        end)
+    end
+
+    return Window
+end
+
+return Library
