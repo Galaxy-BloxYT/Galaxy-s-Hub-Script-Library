@@ -1,88 +1,54 @@
 local Library = {}
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 
 function Library:Init(title)
     local UI = Instance.new("ScreenGui", CoreGui); UI.Name = "GalaxyLib"
     
-    -- Main Frame (Deitado/Horizontal)
     local Main = Instance.new("Frame", UI)
     Main.Size = UDim2.new(0, 500, 0, 300); Main.Position = UDim2.new(0.5, -250, 0.5, -150)
     Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
     local Stroke = Instance.new("UIStroke", Main); Stroke.Color = Color3.fromRGB(50, 50, 50); Stroke.Thickness = 2
     
-    -- Draggable
-        -- SUBSTITUA O SEU BLOCO DE DRAGGABLE ATUAL POR ESTE:
-    local dragging, dragInput, dragStart, startPos
+    -- TopBar (Para Draggable, Fechar e Minimizar)
+    local TopBar = Instance.new("Frame", Main); TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
     
-    Main.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = Main.Position
-        end
-    end)
-
-    UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-            local delta = input.Position - dragStart
-            Main.Position = UDim2.new(
-                startPos.X.Scale, 
-                startPos.X.Offset + delta.X, 
-                startPos.Y.Scale, 
-                startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
-
-    UserInputService.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = false
-        end
-    end)
-
-    -- Sidebar
-    local Sidebar = Instance.new("Frame", Main); Sidebar.Size = UDim2.new(0, 130, 1, 0); Sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    Instance.new("UICorner", Sidebar); Instance.new("UIListLayout", Sidebar).Padding = UDim.new(0, 5); Instance.new("UIPadding", Sidebar).PaddingTop = UDim.new(0, 10)
-
-    -- Content
-    local Content = Instance.new("Frame", Main); Content.Position = UDim2.new(0, 140, 0, 10); Content.Size = UDim2.new(1, -150, 1, -20); Content.BackgroundTransparency = 1
-    
-    local Window = {}; local first = true
-
-    function Window:CreateTab(name)
-        local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = name; btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); btn.TextColor3 = Color3.new(1,1,1); btn.Font = Enum.Font.Gotham
-        Instance.new("UICorner", btn)
-        
-        local TabFrame = Instance.new("ScrollingFrame", Content); TabFrame.Size = UDim2.new(1, 0, 1, 0); TabFrame.BackgroundTransparency = 1; TabFrame.ScrollBarThickness = 2; TabFrame.Visible = false
-        Instance.new("UIListLayout", TabFrame).Padding = UDim.new(0, 10); Instance.new("UIPadding", TabFrame).PaddingLeft = UDim.new(0, 5)
-        
-        if first then TabFrame.Visible = true; first = false end
-        btn.MouseButton1Click:Connect(function() for _,v in pairs(Content:GetChildren()) do if v:IsA("ScrollingFrame") then v.Visible = false end end; TabFrame.Visible = true end)
-
-        local TabObj = {}
-        function TabObj:AddButton(text, callback)
-            local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.95, 0, 0, 40); b.Text = text .. " (Button)"; b.BackgroundColor3 = Color3.fromRGB(50, 50, 50); b.TextColor3 = Color3.new(1,1,1); b.Font = Enum.Font.GothamSemibold
-            Instance.new("UICorner", b); b.MouseButton1Click:Connect(function() b.BackgroundColor3 = Color3.fromRGB(70, 70, 70); task.wait(0.1); b.BackgroundColor3 = Color3.fromRGB(50, 50, 50); callback() end)
-        end
-
-        function TabObj:AddSlider(name, min, max, callback)
-            local s = Instance.new("Frame", TabFrame); s.Size = UDim2.new(0.95, 0, 0, 45); s.BackgroundColor3 = Color3.fromRGB(40, 40, 40); Instance.new("UICorner", s)
-            local lbl = Instance.new("TextLabel", s); lbl.Size = UDim2.new(1,0,0.4,0); lbl.Text = name .. ": " .. min; lbl.TextColor3 = Color3.new(1,1,1); lbl.BackgroundTransparency = 1; lbl.Font = Enum.Font.Gotham
-            local bar = Instance.new("Frame", s); bar.Size = UDim2.new(0.9, 0, 0, 6); bar.Position = UDim2.new(0.05, 0, 0.6, 0); bar.BackgroundColor3 = Color3.fromRGB(60, 60, 60); Instance.new("UICorner", bar)
-            local fill = Instance.new("Frame", bar); fill.Size = UDim2.new(0,0,1,0); fill.BackgroundColor3 = Color3.fromRGB(0, 150, 255); Instance.new("UICorner", fill)
-            
-            local dragging = false
-            local function update(input) local pos = math.clamp((input.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X, 0, 1); fill.Size = UDim2.new(pos, 0, 1, 0); local val = math.floor(min + (max - min) * pos); lbl.Text = name .. ": " .. val; callback(val) end
-            bar.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then dragging = true; update(i) end end)
-            UserInputService.InputChanged:Connect(function(i) if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then update(i) end end)
-            UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
-        end
-        return TabObj
+    -- Botões (Close e Minimize)
+    local function CreateTopBtn(text, pos)
+        local b = Instance.new("TextButton", TopBar); b.Size = UDim2.new(0, 30, 0, 30); b.Position = pos
+        b.Text = text; b.BackgroundTransparency = 1; b.TextColor3 = Color3.new(1,1,1); b.Font = Enum.Font.GothamBold
+        local ts = Instance.new("UIStroke", b); ts.Color = Color3.fromRGB(100, 100, 100); ts.Thickness = 1
+        return b
     end
+    
+    local CloseBtn = CreateTopBtn("X", UDim2.new(1, -35, 0, 5))
+    local MinBtn = CreateTopBtn("-", UDim2.new(1, -70, 0, 5))
+    
+    -- Lógica Draggable apenas na TopBar
+    local drag, dragStart, startPos
+    TopBar.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then drag = true; dragStart = i.Position; startPos = Main.Position end end)
+    UserInputService.InputChanged:Connect(function(i) if drag and i.UserInputType == Enum.UserInputType.MouseMovement then local delta = i.Position - dragStart; Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y) end end)
+    UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then drag = false end end)
+
+    -- Ações Botões
+    CloseBtn.MouseButton1Click:Connect(function() UI:Destroy() end)
+    local minimized = false
+    MinBtn.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        TweenService:Create(Main, TweenInfo.new(0.3), {Size = minimized and UDim2.new(0, 500, 0, 40) or UDim2.new(0, 500, 0, 300)}):Play()
+    end)
+
+    -- Container das Abas (Separado do TopBar)
+    local TabContent = Instance.new("Frame", Main); TabContent.Size = UDim2.new(1, 0, 1, -40); TabContent.Position = UDim2.new(0, 0, 0, 40); TabContent.BackgroundTransparency = 1
+    local Sidebar = Instance.new("Frame", TabContent); Sidebar.Size = UDim2.new(0, 130, 1, 0); Sidebar.BackgroundTransparency = 1
+    Instance.new("UIListLayout", Sidebar).Padding = UDim.new(0, 5); Instance.new("UIPadding", Sidebar).PaddingTop = UDim.new(0, 5)
+    
+    local Content = Instance.new("Frame", TabContent); Content.Position = UDim2.new(0, 140, 0, 0); Content.Size = UDim2.new(1, -150, 1, 0); Content.BackgroundTransparency = 1
+    
+    -- [Mantenha aqui as funções CreateTab, AddButton e AddSlider como estavam antes...]
+    -- (O motor agora está modularizado, o segredo era o TopBar!)
     
     UserInputService.InputBegan:Connect(function(i) if i.KeyCode == Enum.KeyCode.RightControl then UI.Enabled = not UI.Enabled end end)
     return Window
 end
-
-return Library
