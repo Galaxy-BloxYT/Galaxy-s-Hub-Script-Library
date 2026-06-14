@@ -26,7 +26,7 @@ local function BuildUI(title)
     Instance.new("UIStroke", Main).Color = Color3.new(1,1,1); Instance.new("UIStroke", Main).Thickness = 2
     
     local TopBar = Instance.new("Frame", Main); TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
-    local Title = Instance.new("TextLabel", TopBar); Title.Size = UDim2.new(1, -100, 1, 0); Title.Position = UDim2.new(0, 10, 0, 0); Title.Text = _T(title or "Galaxy's Hub | Library"); Title.TextColor3 = Color3.new(1,1,1); Title.Font = Enum.Font.GothamBold; Title.BackgroundTransparency = 1; Title.TextXAlignment = Enum.TextXAlignment.Left; Title.TextScaled = true
+    local Title = Instance.new("TextLabel", TopBar); Title.Size = UDim2.new(1, -100, 1, 0); Title.Position = UDim2.new(0, 10, 0, 0); Title.Text = _T(title or "Galaxy's Hub | Library"); Title.TextColor3 = Color3.new(1,1,1); Title.Font = Enum.Font.GothamBold; Title.BackgroundTransparency = 1; Title.TextXAlignment = Enum.TextXAlignment.Left; Title.TextSize = 18
     
     -- DRAGGABLE
     local dragging, dragStart, startPos
