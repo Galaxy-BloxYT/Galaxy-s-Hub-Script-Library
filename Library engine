@@ -15,7 +15,8 @@ function Library:Init(title)
     
     local TopBar = Instance.new("Frame", Main); TopBar.Name = "TopBar"; TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
     local Title = Instance.new("TextLabel", TopBar); Title.Name = "Title"; Title.Size = UDim2.new(1, -80, 1, 0); Title.Position = UDim2.new(0, 10, 0, 0); Title.Text = title; Title.TextColor3 = Color3.new(1,1,1); Title.Font = Enum.Font.GothamBold; Title.BackgroundTransparency = 1; Title.TextXAlignment = Enum.TextXAlignment.Left
-    
+    local TitleText = Title.Text
+
     local TabContent = Instance.new("Frame", Main); TabContent.Size = UDim2.new(1, 0, 1, -40); TabContent.Position = UDim2.new(0, 0, 0, 40); TabContent.BackgroundTransparency = 1
     local Sidebar = Instance.new("Frame", TabContent); Sidebar.Size = UDim2.new(0, 130, 1, 0); Sidebar.BackgroundTransparency = 1
     Instance.new("UIListLayout", Sidebar).Padding = UDim.new(0, 5); Instance.new("UIPadding", Sidebar).PaddingTop = UDim.new(0, 5)
