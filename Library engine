@@ -9,13 +9,44 @@ local function BuildUI(title)
     getgenv().GalaxyLibRunning = true 
 
     local UI = Instance.new("ScreenGui", CoreGui); UI.Name = "GalaxyLib"
+    local Main = Instance.new("Frame", UI); Main.Size = UDim2.new(0, 500, 0, 300); Main.Position = UDim2.new(0.5, -250, 0.5, -150); Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20); Instance.new("UICorner", Main)
+    Instance.new("UIStroke", Main).Color = Color3.new(1,1,1); Instance.new("UIStroke", Main).Thickness = 2
+
     local NotifyHolder = Instance.new("Frame", UI); NotifyHolder.Name = "NotifyHolder"; NotifyHolder.Size = UDim2.new(0, 260, 1, -20); NotifyHolder.Position = UDim2.new(1, -270, 0, 10); NotifyHolder.BackgroundTransparency = 1; Instance.new("UIListLayout", NotifyHolder).Padding = UDim.new(0, 10)
     
+    local function BuildUI(title)
+    local ExistingUI = CoreGui:FindFirstChild("GalaxyLib")
+    if ExistingUI then ExistingUI:Destroy() end
+    getgenv().GalaxyLibRunning = true 
+
+    local UI = Instance.new("ScreenGui", CoreGui); UI.Name = "GalaxyLib"
     local Main = Instance.new("Frame", UI); Main.Size = UDim2.new(0, 500, 0, 300); Main.Position = UDim2.new(0.5, -250, 0.5, -150); Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20); Instance.new("UICorner", Main)
     Instance.new("UIStroke", Main).Color = Color3.new(1,1,1); Instance.new("UIStroke", Main).Thickness = 2
     
     local TopBar = Instance.new("Frame", Main); TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
-    local Title = Instance.new("TextLabel", TopBar); Title.Size = UDim2.new(1, -100, 1, 0); Title.Position = UDim2.new(0, 10, 0, 0); Title.Text = title; Title.TextColor3 = Color3.new(1,1,1); Title.Font = Enum.Font.GothamBold; Title.BackgroundTransparency = 1; Title.TextXAlignment = Enum.TextXAlignment.Left
+    
+    -- DRAGGABLE SUAVE (Adicionado aqui)
+    local dragging, dragInput, dragStart, startPos
+    TopBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = Main.Position
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
     
     local CloseBtn = Instance.new("TextButton", TopBar); CloseBtn.Size = UDim2.new(0, 30, 0, 30); CloseBtn.Position = UDim2.new(1, -35, 0, 5); CloseBtn.Text = "X"; CloseBtn.BackgroundTransparency = 1; CloseBtn.TextColor3 = Color3.new(1,1,1)
     local MinBtn = Instance.new("TextButton", TopBar); MinBtn.Size = UDim2.new(0, 30, 0, 30); MinBtn.Position = UDim2.new(1, -70, 0, 5); MinBtn.Text = "-"; MinBtn.BackgroundTransparency = 1; MinBtn.TextColor3 = Color3.new(1,1,1)
