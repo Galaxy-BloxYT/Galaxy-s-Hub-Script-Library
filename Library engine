@@ -2,52 +2,63 @@ local Library = {}
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
+local LocalizationService = game:GetService("LocalizationService")
+
+local function _T(text)
+    local success, result = pcall(function() return LocalizationService:Translate(game.Players.LocalPlayer, text, "en") end)
+    return success and result or text
+end
 
 local function BuildUI(title)
     local ExistingUI = CoreGui:FindFirstChild("GalaxyLib")
     if ExistingUI then ExistingUI:Destroy() end
-    
+    getgenv().GalaxyLibRunning = true 
+
     local UI = Instance.new("ScreenGui", CoreGui); UI.Name = "GalaxyLib"; UI.ResetOnSpawn = false
     local Main = Instance.new("Frame", UI); Main.Size = UDim2.new(0, 500, 0, 300); Main.Position = UDim2.new(0.5, -250, 0.5, -150)
     Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
+    Instance.new("UIStroke", Main).Color = Color3.fromRGB(50, 50, 50); Instance.new("UIStroke", Main).Thickness = 2
     
     local TopBar = Instance.new("Frame", Main); TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
-    local Title = Instance.new("TextLabel", TopBar); Title.Name = "Title"; Title.Size = UDim2.new(1, -80, 1, 0); Title.Position = UDim2.new(0, 10, 0, 0); Title.Text = title; Title.TextColor3 = Color3.new(1,1,1); Title.Font = Enum.Font.GothamBold; Title.BackgroundTransparency = 1; Title.TextXAlignment = Enum.TextXAlignment.Left
-
-    -- Drag Suave Universal (PC e Mobile)
-    local drag, dragStart, startPos
-    local function updateDrag(input) local delta = input.Position - dragStart; Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y) end
-    TopBar.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then drag = true; dragStart = i.Position; startPos = Main.Position end end)
-    UserInputService.InputChanged:Connect(function(i) if drag and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then updateDrag(i) end end)
-    UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then drag = false end end)
-
+    local Title = Instance.new("TextLabel", TopBar); Title.Size = UDim2.new(1, -80, 1, 0); Title.Position = UDim2.new(0, 10, 0, 0); Title.Text = _T(title); Title.TextColor3 = Color3.new(1,1,1); Title.Font = Enum.Font.GothamBold; Title.BackgroundTransparency = 1; Title.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local CloseBtn = Instance.new("TextButton", TopBar); CloseBtn.Size = UDim2.new(0, 30, 0, 30); CloseBtn.Position = UDim2.new(1, -35, 0, 5); CloseBtn.Text = "X"; CloseBtn.BackgroundTransparency = 1; CloseBtn.TextColor3 = Color3.new(1,1,1)
+    
+    CloseBtn.MouseButton1Click:Connect(function()
+        local Conf = Instance.new("Frame", Main); Conf.Size = UDim2.new(1, 0, 1, 0); Conf.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Conf.ZIndex = 10; Instance.new("UICorner", Conf)
+        local Yes = Instance.new("TextButton", Conf); Yes.Size = UDim2.new(0, 100, 0, 40); Yes.Position = UDim2.new(0.2, 0, 0.6, 0); Yes.Text = _T("Sim"); Yes.BackgroundColor3 = Color3.fromRGB(200, 50, 50); Instance.new("UICorner", Yes)
+        local No = Instance.new("TextButton", Conf); No.Size = UDim2.new(0, 100, 0, 40); No.Position = UDim2.new(0.6, 0, 0.6, 0); No.Text = _T("Não"); No.BackgroundColor3 = Color3.fromRGB(50, 200, 50); Instance.new("UICorner", No)
+        Yes.MouseButton1Click:Connect(function() getgenv().GalaxyLibRunning = false; UI:Destroy() end)
+        No.MouseButton1Click:Connect(function() Conf:Destroy() end)
+    end)
+    
     local TabContent = Instance.new("Frame", Main); TabContent.Size = UDim2.new(1, 0, 1, -40); TabContent.Position = UDim2.new(0, 0, 0, 40); TabContent.BackgroundTransparency = 1
     local Sidebar = Instance.new("Frame", TabContent); Sidebar.Size = UDim2.new(0, 130, 1, 0); Sidebar.BackgroundTransparency = 1
     Instance.new("UIListLayout", Sidebar).Padding = UDim.new(0, 5)
     local Content = Instance.new("Frame", TabContent); Content.Position = UDim2.new(0, 140, 0, 0); Content.Size = UDim2.new(1, -150, 1, 0); Content.BackgroundTransparency = 1
     
-    local Window = {TopBar = TopBar}; local first = true
-
-    function Window:CreateTab(name, icon)
-        local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = (icon or "") .. " " .. name; btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); btn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", btn)
+    local Window = {}; local first = true
+    function Window:CreateTab(name)
+        local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = _T(name); btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); btn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", btn)
         local TabFrame = Instance.new("ScrollingFrame", Content); TabFrame.Size = UDim2.new(1, 0, 1, 0); TabFrame.BackgroundTransparency = 1; TabFrame.Visible = false; TabFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
         Instance.new("UIListLayout", TabFrame).Padding = UDim.new(0, 10)
         if first then TabFrame.Visible = true; first = false end
         btn.MouseButton1Click:Connect(function() for _,v in pairs(Content:GetChildren()) do if v:IsA("ScrollingFrame") then v.Visible = false end end; TabFrame.Visible = true end)
         
         local TabObj = {}
-        function TabObj:AddButton(t, cb) local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.9, 0, 0, 40); b.Text = t; b.BackgroundColor3 = Color3.fromRGB(50, 50, 50); Instance.new("UICorner", b); b.MouseButton1Click:Connect(cb) end
-        function TabObj:AddToggle(t, cb) local s = false; local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.9, 0, 0, 40); b.Text = t; b.BackgroundColor3 = Color3.fromRGB(50, 50, 50); Instance.new("UICorner", b); b.MouseButton1Click:Connect(function() s = not s; b.BackgroundColor3 = s and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(50, 50, 50); cb(s) end) end
-        function TabObj:AddTextBox(n, p, opt, cb)
-            local C = Instance.new("Frame", TabFrame); C.Size = UDim2.new(0.9, 0, 0, 60); C.BackgroundTransparency = 1
-            Instance.new("TextLabel", C).Text = n; Instance.new("TextBox", C).PlaceholderText = p
-            local T = C:FindFirstChildOfClass("TextBox"); T.Size = UDim2.new(1, 0, 0, 30); T.Position = UDim2.new(0, 0, 0, 25); T.BackgroundColor3 = Color3.fromRGB(40,40,40); Instance.new("UICorner", T)
-            T.FocusLost:Connect(function(enter) if enter then local v = T.Text; if opt.NumbersOnly then v = v:gsub("%D", "") end; if opt.LettersOnly then v = v:gsub("%W", "") end; cb(v) end end)
+        function TabObj:AddButton(t, cb) local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.95, 0, 0, 40); b.Text = _T(t); b.BackgroundColor3 = Color3.fromRGB(50, 50, 50); Instance.new("UICorner", b); Instance.new("UIStroke", b).Color = Color3.fromRGB(70,70,70); b.MouseButton1Click:Connect(cb) end
+        function TabObj:AddToggle(t, cb) local s = false; local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.95, 0, 0, 40); b.Text = _T(t); b.BackgroundColor3 = Color3.fromRGB(50, 50, 50); Instance.new("UICorner", b); Instance.new("UIStroke", b).Color = Color3.fromRGB(70,70,70); b.MouseButton1Click:Connect(function() s = not s; b.BackgroundColor3 = s and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(50, 50, 50); cb(s) end) end
+        function TabObj:AddSlider(n, min, max, cb)
+            local s = Instance.new("Frame", TabFrame); s.Size = UDim2.new(0.95, 0, 0, 45); s.BackgroundColor3 = Color3.fromRGB(40, 40, 40); Instance.new("UICorner", s)
+            local l = Instance.new("TextLabel", s); l.Size = UDim2.new(1,0,0.5,0); l.Text = _T(n)..": "..min; l.BackgroundTransparency = 1; local b = Instance.new("Frame", s); b.Size = UDim2.new(0.9, 0, 0, 6); b.Position = UDim2.new(0.05, 0, 0.6, 0); b.BackgroundColor3 = Color3.fromRGB(60, 60, 60); Instance.new("UICorner", b)
+            local f = Instance.new("Frame", b); f.Size = UDim2.new(0,0,1,0); f.BackgroundColor3 = Color3.fromRGB(0, 150, 255); Instance.new("UICorner", f)
+            b.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 then local c; c = UserInputService.InputChanged:Connect(function(inp) if inp.UserInputType==Enum.UserInputType.MouseMovement then local p = math.clamp((inp.Position.X - b.AbsolutePosition.X)/b.AbsoluteSize.X, 0, 1); f.Size = UDim2.new(p,0,1,0); local v = math.floor(min + (max-min)*p); l.Text = _T(n)..": "..v; cb(v) end end); UserInputService.InputEnded:Connect(function(inp) if inp.UserInputType==Enum.UserInputType.MouseButton1 then c:Disconnect() end end) end end)
         end
-        function TabObj:AddLabel(t, d)
-            local C = Instance.new("Frame", TabFrame); C.Size = UDim2.new(0.9, 0, 0, 50); C.BackgroundTransparency = 1
-            Instance.new("TextLabel", C).Text = "<b>"..t.."</b>"; Instance.new("TextLabel", C).RichText = true; Instance.new("TextLabel", C).Position = UDim2.new(0,0,0,0)
-            Instance.new("TextLabel", C).Text = d; Instance.new("TextLabel", C).Position = UDim2.new(0,0,0,25)
+        function TabObj:AddDropdown(n, l, cb)
+            local d = Instance.new("TextButton", TabFrame); d.Size = UDim2.new(0.95, 0, 0, 40); d.Text = _T(n).." [v]"; d.BackgroundColor3 = Color3.fromRGB(50, 50, 50); Instance.new("UICorner", d)
+            local lh = Instance.new("Frame", TabFrame); lh.Size = UDim2.new(0.95, 0, 0, #l * 35); lh.BackgroundColor3 = Color3.fromRGB(40, 40, 40); lh.Visible = false; Instance.new("UIListLayout", lh); Instance.new("UICorner", lh)
+            local open = false; d.MouseButton1Click:Connect(function() open = not open; lh.Visible = open; d.Text = _T(n)..(open and " [^]" or " [v]") end)
+            for _, i in pairs(l) do local o = Instance.new("TextButton", lh); o.Size = UDim2.new(1, 0, 0, 35); o.Text = i; o.BackgroundTransparency = 1; o.MouseButton1Click:Connect(function() open=false; lh.Visible=false; d.Text=_T(n)..": "..i; cb(i) end) end
         end
         return TabObj
     end
