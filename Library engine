@@ -40,18 +40,20 @@ local function BuildUI(title)
     local Window = {}
     function Window:Notify(t, d, b)
         local N = Instance.new("Frame", NotifyHolder); N.Size = UDim2.new(1, 0, 0, (b and 120 or 80)); N.BackgroundColor3 = Color3.fromRGB(30, 30, 30); N.BackgroundTransparency = 1; Instance.new("UICorner", N); Instance.new("UIStroke", N).Color = Color3.new(1,1,1)
-        Instance.new("TextLabel", N).Size = UDim2.new(1,0,0,30); N:FindFirstChildOfClass("TextLabel").Text = t; N:FindFirstChildOfClass("TextLabel").TextColor3 = Color3.new(255,255,255); N:FindFirstChildOfClass("TextLabel").BackgroundTransparency = 1
+        Instance.new("TextLabel", N).Size = UDim2.new(1,0,0,30); N:FindFirstChildOfClass("TextLabel").Text = t; N:FindFirstChildOfClass("TextLabel").TextColor3 = Color3.new(1,1,1); N:FindFirstChildOfClass("TextLabel").BackgroundTransparency = 1
         TweenService:Create(N, TweenInfo.new(0.5), {BackgroundTransparency = 0.1}):Play()
         if b then for n, c in pairs(b) do local btn = Instance.new("TextButton", N); btn.Size = UDim2.new(0.4, 0, 0, 30); btn.Position = UDim2.new(0.3, 0, 0, 80); btn.Text = n; btn.BackgroundColor3 = Color3.fromRGB(100,100,100); Instance.new("UICorner", btn); btn.MouseButton1Click:Connect(function() c(); N:Destroy() end) end else task.wait(3); N:Destroy() end
     end
+
     function Window:CreateTab(name)
         local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = name; btn.TextColor3 = Color3.new(1,1,1); btn.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", btn); Instance.new("UIStroke", btn).Color = Color3.new(1,1,1)
         local TabFrame = Instance.new("ScrollingFrame", Content); TabFrame.Size = UDim2.new(1, 0, 1, 0); TabFrame.BackgroundTransparency = 1; TabFrame.Visible = false; TabFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
         btn.MouseButton1Click:Connect(function() for _,v in pairs(Content:GetChildren()) do if v:IsA("ScrollingFrame") then v.Visible = false end end; TabFrame.Visible = true end)
+        
         local TabObj = {}
         function TabObj:AddButton(t, cb) local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.9, 0, 0, 40); b.Text = t; b.TextColor3 = Color3.new(1,1,1); b.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", b); Instance.new("UIStroke", b).Color = Color3.new(1,1,1); b.MouseButton1Click:Connect(cb) end
         function TabObj:AddToggle(t, cb) local s = false; local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.9, 0, 0, 40); b.Text = t; b.TextColor3 = Color3.new(1,1,1); b.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", b); Instance.new("UIStroke", b).Color = Color3.new(1,1,1); b.MouseButton1Click:Connect(function() s = not s; b.BackgroundColor3 = s and Color3.fromRGB(0, 100, 255) or Color3.fromRGB(30,30,30); cb(s) end) end
-                function TabObj:AddSlider(n, min, max, cb)
+        function TabObj:AddSlider(n, min, max, cb)
             local s = Instance.new("Frame", TabFrame); s.Size = UDim2.new(0.9, 0, 0, 50); s.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Instance.new("UICorner", s); Instance.new("UIStroke", s).Color = Color3.new(1,1,1)
             local l = Instance.new("TextLabel", s); l.Size = UDim2.new(1, 0, 0.4, 0); l.Text = n..": "..min; l.TextColor3 = Color3.new(1,1,1); l.BackgroundTransparency = 1; l.Font = Enum.Font.GothamBold
             local bar = Instance.new("Frame", s); bar.Size = UDim2.new(0.9, 0, 0, 6); bar.Position = UDim2.new(0.05, 0, 0.6, 0); bar.BackgroundColor3 = Color3.fromRGB(50, 50, 50); Instance.new("UICorner", bar)
@@ -67,7 +69,9 @@ local function BuildUI(title)
             
             bar.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then move(i); local c; c = UserInputService.InputChanged:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch then move(inp) end end); UserInputService.InputEnded:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then c:Disconnect() end end) end end)
         end
+        return TabObj
+    end -- Fecha o CreateTab
     return Window
-end
+end -- Fecha o BuildUI
 Library.Construct = BuildUI
 return Library
