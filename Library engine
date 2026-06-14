@@ -42,7 +42,7 @@ local function BuildUI(title)
         local N = Instance.new("Frame", NotifyHolder); N.Size = UDim2.new(1, 0, 0, (b and 120 or 80)); N.BackgroundColor3 = Color3.fromRGB(30, 30, 30); N.BackgroundTransparency = 1; Instance.new("UICorner", N); Instance.new("UIStroke", N).Color = Color3.new(1,1,1)
         Instance.new("TextLabel", N).Size = UDim2.new(1,0,0,30); N:FindFirstChildOfClass("TextLabel").Text = t; N:FindFirstChildOfClass("TextLabel").TextColor3 = Color3.new(255,255,255); N:FindFirstChildOfClass("TextLabel").BackgroundTransparency = 1
         TweenService:Create(N, TweenInfo.new(0.5), {BackgroundTransparency = 0.1}):Play()
-        if b then for n, c in pairs(b) do local btn = Instance.new("TextButton", N); btn.Size = UDim2.new(0.4, 0, 0, 30); btn.Position = UDim2.new(0.3, 0, 0, 80); btn.Text = n; btn.BackgroundColor3 = Color3.fromRGB(50,50,50); Instance.new("UICorner", btn); btn.MouseButton1Click:Connect(function() c(); N:Destroy() end) end else task.wait(3); N:Destroy() end
+        if b then for n, c in pairs(b) do local btn = Instance.new("TextButton", N); btn.Size = UDim2.new(0.4, 0, 0, 30); btn.Position = UDim2.new(0.3, 0, 0, 80); btn.Text = n; btn.BackgroundColor3 = Color3.fromRGB(100,100,100); Instance.new("UICorner", btn); btn.MouseButton1Click:Connect(function() c(); N:Destroy() end) end else task.wait(3); N:Destroy() end
     end
     function Window:CreateTab(name)
         local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = name; btn.TextColor3 = Color3.new(1,1,1); btn.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", btn); Instance.new("UIStroke", btn).Color = Color3.new(1,1,1)
