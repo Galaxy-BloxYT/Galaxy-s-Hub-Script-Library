@@ -3,7 +3,7 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 
-function Library:CreateInterface(title)
+local function BuildUI(title)
     if CoreGui:FindFirstChild("GalaxyLib") then CoreGui.GalaxyLib:Destroy() end
     
     local UI = Instance.new("ScreenGui", CoreGui); UI.Name = "GalaxyLib"; UI.ResetOnSpawn = false
@@ -15,8 +15,7 @@ function Library:CreateInterface(title)
     
     local TopBar = Instance.new("Frame", Main); TopBar.Name = "TopBar"; TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
     local Title = Instance.new("TextLabel", TopBar); Title.Name = "Title"; Title.Size = UDim2.new(1, -80, 1, 0); Title.Position = UDim2.new(0, 10, 0, 0); Title.Text = title; Title.TextColor3 = Color3.new(1,1,1); Title.Font = Enum.Font.GothamBold; Title.BackgroundTransparency = 1; Title.TextXAlignment = Enum.TextXAlignment.Left
-    local TitleText = Title.Text
-
+    
     local TabContent = Instance.new("Frame", Main); TabContent.Size = UDim2.new(1, 0, 1, -40); TabContent.Position = UDim2.new(0, 0, 0, 40); TabContent.BackgroundTransparency = 1
     local Sidebar = Instance.new("Frame", TabContent); Sidebar.Size = UDim2.new(0, 130, 1, 0); Sidebar.BackgroundTransparency = 1
     Instance.new("UIListLayout", Sidebar).Padding = UDim.new(0, 5); Instance.new("UIPadding", Sidebar).PaddingTop = UDim.new(0, 5)
@@ -72,99 +71,6 @@ function Library:CreateInterface(title)
     return Window
 end
 
-return Library
-    Instance.new("UIListLayout", Sidebar).Padding = UDim.new(0, 5); Instance.new("UIPadding", Sidebar).PaddingTop = UDim.new(0, 5)
-    
-    local Content = Instance.new("Frame", TabContent); Content.Position = UDim2.new(0, 140, 0, 0); Content.Size = UDim2.new(1, -150, 1, 0); Content.BackgroundTransparency = 1
-    
-    local Window = {}; local first = true
-    function Window:CreateTab(name)
-        local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = name; btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); btn.TextColor3 = Color3.new(1,1,1); btn.Font = Enum.Font.Gotham
-        Instance.new("UICorner", btn)
-        local TabFrame = Instance.new("ScrollingFrame", Content); TabFrame.Size = UDim2.new(1, 0, 1, 0); TabFrame.BackgroundTransparency = 1; TabFrame.ScrollBarThickness = 2; TabFrame.Visible = false
-        Instance.new("UIListLayout", TabFrame).Padding = UDim.new(0, 10); Instance.new("UIPadding", TabFrame).PaddingLeft = UDim.new(0, 5)
-        if first then TabFrame.Visible = true; first = false end
-        btn.MouseButton1Click:Connect(function() for _,v in pairs(Content:GetChildren()) do if v:IsA("ScrollingFrame") then v.Visible = false end end; TabFrame.Visible = true end)
-        local TabObj = {}
-        function TabObj:AddButton(text, callback)
-            local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.95, 0, 0, 40); b.Text = text .. " (Button)"; b.BackgroundColor3 = Color3.fromRGB(50, 50, 50); b.TextColor3 = Color3.new(1,1,1); b.Font = Enum.Font.GothamSemibold
-            Instance.new("UICorner", b); b.MouseButton1Click:Connect(function() b.BackgroundColor3 = Color3.fromRGB(70, 70, 70); task.wait(0.1); b.BackgroundColor3 = Color3.fromRGB(50, 50, 50); callback() end)
-        end
-        function TabObj:AddSlider(name, min, max, callback)
-            local s = Instance.new("Frame", TabFrame); s.Size = UDim2.new(0.95, 0, 0, 45); s.BackgroundColor3 = Color3.fromRGB(40, 40, 40); Instance.new("UICorner", s)
-            local lbl = Instance.new("TextLabel", s); lbl.Size = UDim2.new(1,0,0.4,0); lbl.Text = name .. ": " .. min; lbl.TextColor3 = Color3.new(1,1,1); lbl.BackgroundTransparency = 1; lbl.Font = Enum.Font.Gotham
-            local bar = Instance.new("Frame", s); bar.Size = UDim2.new(0.9, 0, 0, 6); bar.Position = UDim2.new(0.05, 0, 0.6, 0); bar.BackgroundColor3 = Color3.fromRGB(60, 60, 60); Instance.new("UICorner", bar)
-            local fill = Instance.new("Frame", bar); fill.Size = UDim2.new(0,0,1,0); fill.BackgroundColor3 = Color3.fromRGB(0, 150, 255); Instance.new("UICorner", fill)
-            local dragging = false
-            local function update(input) local pos = math.clamp((input.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X, 0, 1); fill.Size = UDim2.new(pos, 0, 1, 0); local val = math.floor(min + (max - min) * pos); lbl.Text = name .. ": " .. val; callback(val) end
-            bar.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then dragging = true; update(i) end end)
-            UserInputService.InputChanged:Connect(function(i) if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then update(i) end end)
-            UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
-        end
-        return TabObj
-    end
-    
-    UserInputService.InputBegan:Connect(function(i) if i.KeyCode == Enum.KeyCode.RightControl then UI.Enabled = not UI.Enabled end end)
-    return Window
-end
-
-return Library
-local Library = {}
-local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local CoreGui = game:GetService("CoreGui")
-
-function Library:Init(title)
-    if CoreGui:FindFirstChild("GalaxyLib") then CoreGui.GalaxyLib:Destroy() end
-    
-    local UI = Instance.new("ScreenGui", CoreGui); UI.Name = "GalaxyLib"; UI.ResetOnSpawn = false
-    local NotifyHolder = Instance.new("Frame", UI); NotifyHolder.Size = UDim2.new(0, 260, 1, -20); NotifyHolder.Position = UDim2.new(1, -270, 0, 10); NotifyHolder.BackgroundTransparency = 1
-    Instance.new("UIListLayout", NotifyHolder).Padding = UDim.new(0, 10)
-
-    local Main = Instance.new("Frame", UI); Main.Size = UDim2.new(0, 500, 0, 300); Main.Position = UDim2.new(0.5, -250, 0.5, -150)
-    Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
-    
-    local TopBar = Instance.new("Frame", Main); TopBar.Name = "TopBar"; TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
-    local Title = Instance.new("TextLabel", TopBar); Title.Name = "Title"; Title.Size = UDim2.new(1, -80, 1, 0); Title.Position = UDim2.new(0, 10, 0, 0); Title.Text = title; Title.TextColor3 = Color3.new(1,1,1); Title.Font = Enum.Font.GothamBold; Title.BackgroundTransparency = 1; Title.TextXAlignment = Enum.TextXAlignment.Left
-    
-    local TabContent = Instance.new("Frame", Main); TabContent.Size = UDim2.new(1, 0, 1, -40); TabContent.Position = UDim2.new(0, 0, 0, 40); TabContent.BackgroundTransparency = 1
-    local Sidebar = Instance.new("Frame", TabContent); Sidebar.Size = UDim2.new(0, 130, 1, 0); Sidebar.BackgroundTransparency = 1
-    Instance.new("UIListLayout", Sidebar).Padding = UDim.new(0, 5); Instance.new("UIPadding", Sidebar).PaddingTop = UDim.new(0, 5)
-    local Content = Instance.new("Frame", TabContent); Content.Position = UDim2.new(0, 140, 0, 0); Content.Size = UDim2.new(1, -150, 1, 0); Content.BackgroundTransparency = 1
-    
-    -- Correção aplicada mantendo a estrutura original:
-    local Window = {TopBar = TopBar}
-
-    function Window:Notify(title, text, buttons, locked)
-        local N = Instance.new("Frame", NotifyHolder); N.Size = UDim2.new(1, 0, 0, 120); N.BackgroundColor3 = Color3.fromRGB(35, 35, 35); Instance.new("UICorner", N)
-        Instance.new("TextLabel", N).Size = UDim2.new(1,0,0,30); Instance.new("TextLabel", N).Text = title
-        local D = Instance.new("TextLabel", N); D.Position = UDim2.new(0,0,0,30); D.Text = text
-        local BC = Instance.new("Frame", N); BC.Position = UDim2.new(0,0,0,80); BC.Size = UDim2.new(1,0,0,40); BC.BackgroundTransparency = 1; Instance.new("UIListLayout", BC).FillDirection = Enum.FillDirection.Horizontal
-        if buttons then for n, cb in pairs(buttons) do local b = Instance.new("TextButton", BC); b.Size = UDim2.new(0.4, 0, 0.8, 0); b.Text = n; b.MouseButton1Click:Connect(function() if not locked then N:Destroy(); cb() end end) end end
-        task.wait(5); if N then N:Destroy() end
-    end
-
-    function Window:CreateTab(name)
-        local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = name; btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40); btn.TextColor3 = Color3.new(1,1,1); btn.Font = Enum.Font.Gotham; Instance.new("UICorner", btn)
-        local TabFrame = Instance.new("ScrollingFrame", Content); TabFrame.Size = UDim2.new(1, 0, 1, 0); TabFrame.BackgroundTransparency = 1; TabFrame.ScrollBarThickness = 2; TabFrame.Visible = false
-        Instance.new("UIListLayout", TabFrame).Padding = UDim.new(0, 10); Instance.new("UIPadding", TabFrame).PaddingLeft = UDim.new(0, 5)
-        if #Content:GetChildren() == 1 then TabFrame.Visible = true end
-        btn.MouseButton1Click:Connect(function() for _,v in pairs(Content:GetChildren()) do if v:IsA("ScrollingFrame") then v.Visible = false end end; TabFrame.Visible = true end)
-        
-        local TabObj = {}
-        function TabObj:AddButton(t, cb) local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.95, 0, 0, 40); b.Text = t; b.BackgroundColor3 = Color3.fromRGB(50, 50, 50); Instance.new("UICorner", b); b.MouseButton1Click:Connect(cb) end
-        function TabObj:AddSlider(n, min, max, cb)
-            local s = Instance.new("Frame", TabFrame); s.Size = UDim2.new(0.95, 0, 0, 45); s.BackgroundColor3 = Color3.fromRGB(40, 40, 40); Instance.new("UICorner", s)
-            local l = Instance.new("TextLabel", s); l.Size = UDim2.new(1,0,0.4,0); l.Text = n..": "..min; l.TextColor3 = Color3.new(1,1,1); l.BackgroundTransparency = 1; local b = Instance.new("Frame", s); b.Size = UDim2.new(0.9, 0, 0, 6); b.Position = UDim2.new(0.05, 0, 0.6, 0); b.BackgroundColor3 = Color3.fromRGB(60,60,60); Instance.new("UICorner", b)
-            local f = Instance.new("Frame", b); f.Size = UDim2.new(0,0,1,0); f.BackgroundColor3 = Color3.fromRGB(0, 150, 255); Instance.new("UICorner", f)
-            local function update(i) local pos = math.clamp((i.Position.X - b.AbsolutePosition.X) / b.AbsoluteSize.X, 0, 1); f.Size = UDim2.new(pos, 0, 1, 0); local val = math.floor(min + (max - min) * pos); l.Text = n..": "..val; cb(val) end
-            b.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then update(i) end end)
-        end
-        return TabObj
-    end
-    
-    UserInputService.InputBegan:Connect(function(i) if i.KeyCode == Enum.KeyCode.RightControl then UI.Enabled = not UI.Enabled end end)
-    return Window
-end
-
+-- A Library agora expõe uma função direta chamada Construct
+Library.Construct = BuildUI
 return Library
