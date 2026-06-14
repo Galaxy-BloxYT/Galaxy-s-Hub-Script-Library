@@ -3,7 +3,7 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
 
-function Library:Init(title)
+function Library:CreateInterface(title)
     if CoreGui:FindFirstChild("GalaxyLib") then CoreGui.GalaxyLib:Destroy() end
     
     local UI = Instance.new("ScreenGui", CoreGui); UI.Name = "GalaxyLib"; UI.ResetOnSpawn = false
