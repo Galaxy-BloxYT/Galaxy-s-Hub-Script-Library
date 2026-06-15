@@ -41,6 +41,7 @@ local function BuildUI(title)
    function Window:Notify(t, d, IsButtonsEnabled, buttons)
         
     local Window = {}
+        function Window:Notify(t, d, IsButtonsEnabled, buttons)
         local NotifyHolder = Instance.new("Frame", UI); NotifyHolder.Name = "NotifyHolder"; NotifyHolder.Size = UDim2.new(0, 260, 1, -20); NotifyHolder.Position = UDim2.new(1, -270, 0, 10); NotifyHolder.BackgroundTransparency = 1; Instance.new("UIListLayout", NotifyHolder).Padding = UDim.new(0, 10)
         Instance.new("TextLabel", NotifyHolder, {Size=UDim2.new(1,0,0,30), Text=_T(t), TextColor3=Color3.new(1,1,1), BackgroundTransparency=1})
         local Desc = Instance.new("TextLabel", NotifyHolder); Desc.Size = UDim2.new(1,0,0,30); Desc.Position = UDim2.new(0,0,0,30); Desc.Text = _T(d); Desc.TextColor3 = Color3.new(0.8,0.8,0.8); Desc.BackgroundTransparency = 1
