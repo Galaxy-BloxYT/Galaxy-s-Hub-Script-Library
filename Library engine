@@ -39,6 +39,8 @@ local function BuildUI(title)
     local Content = Instance.new("Frame", TabContent); Content.Position = UDim2.new(0, 140, 0, 0); Content.Size = UDim2.new(1, -150, 1, 0); Content.BackgroundTransparency = 1
 
    function Window:Notify(t, d, IsButtonsEnabled, buttons)
+        
+    local Window = {}
         local NotifyHolder = Instance.new("Frame", UI); NotifyHolder.Name = "NotifyHolder"; NotifyHolder.Size = UDim2.new(0, 260, 1, -20); NotifyHolder.Position = UDim2.new(1, -270, 0, 10); NotifyHolder.BackgroundTransparency = 1; Instance.new("UIListLayout", NotifyHolder).Padding = UDim.new(0, 10)
         Instance.new("TextLabel", NotifyHolder, {Size=UDim2.new(1,0,0,30), Text=_T(t), TextColor3=Color3.new(1,1,1), BackgroundTransparency=1})
         local Desc = Instance.new("TextLabel", NotifyHolder); Desc.Size = UDim2.new(1,0,0,30); Desc.Position = UDim2.new(0,0,0,30); Desc.Text = _T(d); Desc.TextColor3 = Color3.new(0.8,0.8,0.8); Desc.BackgroundTransparency = 1
@@ -52,7 +54,7 @@ local function BuildUI(title)
         end
     end
 
-    local Window = {}
+
     function Window:CreateTab(name)
         local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = _T(name); btn.TextColor3 = Color3.new(1,1,1); btn.BackgroundColor3 = Color3.fromRGB(40,40,40); Instance.new("UICorner", btn); Instance.new("UIStroke", btn).Color = Color3.new(1,1,1); btn.Font = Enum.Font.Gotham; btn.TextSize = 13
         local TabFrame = Instance.new("ScrollingFrame", Content); TabFrame.Size = UDim2.new(1, 0, 1, 0); TabFrame.BackgroundTransparency = 1; TabFrame.Visible = false; TabFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
