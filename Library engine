@@ -21,12 +21,12 @@ local function BuildUI(title, theme)
 
     local UI = Instance.new("ScreenGui", CoreGui); UI.Name = "GSHUBLIB"
     local Main = Instance.new("Frame", UI); Main.Size = UDim2.new(0, 500, 0, 350); Main.Position = UDim2.new(0.5, -250, 0.5, -175); Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20); Instance.new("UICorner", Main)
-    Instance.new("UIStroke", Main).Color = Color3.new(1,1,1); Instance.new("UIStroke", Main).Thickness = 2
+    local stroke = Instance.new("UIStroke", Main); stroke.Color = Color3.new(1,1,1); stroke.Thickness = 2
     
     local TopBar = Instance.new("Frame", Main); TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
     local Txt = Instance.new("TextLabel", TopBar); Txt.Size = UDim2.new(1, -100, 1, 0); Txt.Position = UDim2.new(0, 10, 0, 0); Txt.Text = title; Txt.TextColor3 = Color3.new(1,1,1); Txt.Font = Enum.Font.GothamBold; Txt.TextSize = 16; Txt.BackgroundTransparency = 1; Txt.TextXAlignment = Enum.TextXAlignment.Left
 
-    local dragging, dragStart, startPos = false, nil, nil, nil
+    local dragging, dragStart, startPos = false, nil, nil
 
     local function update(input)
         local delta = input.Position - dragStart
@@ -62,8 +62,8 @@ local function BuildUI(title, theme)
     function Window:Notify(t, d, IsButtonsEnabled, buttons)
         local NotifyHolder = Instance.new("Frame", UI)
         NotifyHolder.Name = "NotifyHolder"; NotifyHolder.Size = UDim2.new(0, 260, 1, -20); NotifyHolder.Position = UDim2.new(1, -270, 0, 10); NotifyHolder.BackgroundTransparency = 1; Instance.new("UIListLayout", NotifyHolder).Padding = UDim.new(0, 10)
-        Instance.new("TextLabel", NotifyHolder, {Size=UDim2.new(1,0,0,30), Text=_T(t), TextColor3=Color3.new(1,1,1), BackgroundTransparency=1})
-        local Desc = Instance.new("TextLabel", NotifyHolder); Desc.Size = UDim2.new(1,0,0,30); Desc.Position = UDim2.new(0,0,0,30); Desc.Text = _T(d); Desc.TextColor3 = Color3.new(0.8,0.8,0.8); Desc.BackgroundTransparency = 1
+        local lbl = Instance.new("TextLabel", NotifyHolder); lbl.Size = UDim2.new(1,0,0,30); lbl.Text = _T(t); lbl.TextColor3 = Color3.new(1,1,1); lbl.BackgroundTransparency = 1
+        local Desc = Instance.new("TextLabel", NotifyHolder); Desc.Size = UDim2.new(1,0,0,30); Desc.Text = _T(d); Desc.TextColor3 = Color3.new(0.8,0.8,0.8); Desc.BackgroundTransparency = 1
         
         if IsButtonsEnabled and buttons then
             for name, callback in pairs(buttons) do
