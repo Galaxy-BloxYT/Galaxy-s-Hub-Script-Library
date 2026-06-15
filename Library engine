@@ -27,7 +27,7 @@ local function BuildUI(title)
     
     local TopBar = Instance.new("Frame", Main); TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
     local ScriptTitle = Instance.new("TextLabel", TopBar); ScriptTitle.Size = UDim2.new(1, -100, 1, 0); ScriptTitle.Position = UDim2.new(0, 10, 0, 0); ScriptTitle.Text = _T(title or "Galaxy's Hub | Library"); ScriptTitle.TextColor3 = Color3.new(1,1,1); ScriptTitle.Font = Enum.Font.GothamBold; ScriptTitle.BackgroundTransparency = 1; ScriptTitle.TextXAlignment = Enum.TextXAlignment.Left; ScriptTitle.TextSize = 18
-    
+
     -- DRAGGABLE
     local dragging, dragStart, startPos
     TopBar.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = true; dragStart = input.Position; startPos = Main.Position end end)
@@ -38,25 +38,27 @@ local function BuildUI(title)
     local Sidebar = Instance.new("Frame", TabContent); Sidebar.Size = UDim2.new(0, 130, 1, 0); Sidebar.BackgroundTransparency = 1; Instance.new("UIListLayout", Sidebar)
     local Content = Instance.new("Frame", TabContent); Content.Position = UDim2.new(0, 140, 0, 0); Content.Size = UDim2.new(1, -150, 1, 0); Content.BackgroundTransparency = 1
 
-   function Window:Notify(t, d, IsButtonsEnabled, buttons)
-        
+
     local Window = {}
-        function Window:Notify(t, d, IsButtonsEnabled, buttons)
-        local NotifyHolder = Instance.new("Frame", UI); NotifyHolder.Name = "NotifyHolder"; NotifyHolder.Size = UDim2.new(0, 260, 1, -20); NotifyHolder.Position = UDim2.new(1, -270, 0, 10); NotifyHolder.BackgroundTransparency = 1; Instance.new("UIListLayout", NotifyHolder).Padding = UDim.new(0, 10)
+
+    -- 2. Defina os métodos DEPOIS da tabela existir
+    function Window:Notify(t, d, IsButtonsEnabled, buttons)
+        local NotifyHolder = Instance.new("Frame", UI)
+        NotifyHolder.Name = "NotifyHolder"; NotifyHolder.Size = UDim2.new(0, 260, 1, -20); NotifyHolder.Position = UDim2.new(1, -270, 0, 10); NotifyHolder.BackgroundTransparency = 1; Instance.new("UIListLayout", NotifyHolder).Padding = UDim.new(0, 10)
+        
         Instance.new("TextLabel", NotifyHolder, {Size=UDim2.new(1,0,0,30), Text=_T(t), TextColor3=Color3.new(1,1,1), BackgroundTransparency=1})
         local Desc = Instance.new("TextLabel", NotifyHolder); Desc.Size = UDim2.new(1,0,0,30); Desc.Position = UDim2.new(0,0,0,30); Desc.Text = _T(d); Desc.TextColor3 = Color3.new(0.8,0.8,0.8); Desc.BackgroundTransparency = 1
         
         if IsButtonsEnabled and buttons then
             for name, callback in pairs(buttons) do
-                local btn = Instance.new("TextButton", N); btn.Size = UDim2.new(0.4, 0, 0, 30); btn.Text = _T(name); btn.BackgroundColor3 = Color3.fromRGB(0, 100, 255); btn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", btn); Instance.new("UIStroke", btn).Color = Color3.new(1,1,1); btn.MouseButton1Click:Connect(function() callback(); N:Destroy() end)
+                local btn = Instance.new("TextButton", NotifyHolder); btn.Size = UDim2.new(0.4, 0, 0, 30); btn.Text = _T(name); btn.BackgroundColor3 = Color3.fromRGB(0, 100, 255); btn.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", btn); Instance.new("UIStroke", btn).Color = Color3.new(1,1,1); btn.MouseButton1Click:Connect(function() callback(); NotifyHolder:Destroy() end)
             end
         else
             task.wait(3); NotifyHolder:Destroy()
         end
     end
 
-
-    function Window:CreateTab(name)
+   function Window:CreateTab(name)
         local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = _T(name); btn.TextColor3 = Color3.new(1,1,1); btn.BackgroundColor3 = Color3.fromRGB(40,40,40); Instance.new("UICorner", btn); Instance.new("UIStroke", btn).Color = Color3.new(1,1,1); btn.Font = Enum.Font.Gotham; btn.TextSize = 13
         local TabFrame = Instance.new("ScrollingFrame", Content); TabFrame.Size = UDim2.new(1, 0, 1, 0); TabFrame.BackgroundTransparency = 1; TabFrame.Visible = false; TabFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
         btn.MouseButton1Click:Connect(function() for _,v in pairs(Content:GetChildren()) do if v:IsA("ScrollingFrame") then v.Visible = false end end; TabFrame.Visible = true end)
@@ -76,5 +78,10 @@ local function BuildUI(title)
     end
     return Window
 end
+
+    local TabContent = Instance.new("Frame", Main); TabContent.Size = UDim2.new(1, 0, 1, -40); TabContent.Position = UDim2.new(0, 0, 0, 40); TabContent.BackgroundTransparency = 1
+    local Sidebar = Instance.new("Frame", TabContent); Sidebar.Size = UDim2.new(0, 130, 1, 0); Sidebar.BackgroundTransparency = 1; Instance.new("UIListLayout", Sidebar)
+    local Content = Instance.new("Frame", TabContent); Content.Position = UDim2.new(0, 140, 0, 0); Content.Size = UDim2.new(1, -150, 1, 0); Content.BackgroundTransparency = 1
+
 Library.Construct = BuildUI
 return Library
