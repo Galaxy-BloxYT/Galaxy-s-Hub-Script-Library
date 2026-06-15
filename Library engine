@@ -1,9 +1,9 @@
 local Library = {}
+local TweenService = game:GetService("TweenService") -- Adicione isso no topo da Engine
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local LocalizationService = game:GetService("LocalizationService")
 
--- Adicionado a definição da função _T que estava faltando
 local function _T(text)
     local success, translator = pcall(function()
         return LocalizationService:GetTranslatorForLocaleAsync(LocalizationService.RobloxLocaleId)
@@ -27,7 +27,34 @@ local function BuildUI(title, theme)
     
     local TopBar = Instance.new("Frame", Main); TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
     local Txt = Instance.new("TextLabel", TopBar); Txt.Size = UDim2.new(1, -100, 1, 0); Txt.Position = UDim2.new(0, 10, 0, 0); Txt.Text = title; Txt.TextColor3 = Color3.new(1,1,1); Txt.Font = Enum.Font.GothamBold; Txt.TextSize = 16; Txt.BackgroundTransparency = 1; Txt.TextXAlignment = Enum.TextXAlignment.Left; Instance.new("UIStroke", Txt).Color = Color3.new(1,1,1)
-    
+
+    local dragging, dragInput, dragStart, startPos = false, nil, nil, nil
+
+local function update(input)
+    local delta = input.Position - dragStart
+    local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    -- Tween suave para a nova posição
+    TweenService:Create(Main, TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = newPos}):Play()
+end
+
+TopBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        update(input)
+    end
+end)
+
     local CloseBtn = Instance.new("TextButton", TopBar); CloseBtn.Size = UDim2.new(0, 25, 0, 25); CloseBtn.Position = UDim2.new(1, -35, 0, 7); CloseBtn.Text = "X"; CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50); Instance.new("UICorner", CloseBtn); CloseBtn.MouseButton1Click:Connect(function() UI:Destroy() end)
     local MinBtn = Instance.new("TextButton", TopBar); MinBtn.Size = UDim2.new(0, 25, 0, 25); MinBtn.Position = UDim2.new(1, -65, 0, 7); MinBtn.Text = "-"; MinBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80); Instance.new("UICorner", MinBtn); MinBtn.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
     
@@ -52,8 +79,6 @@ local function BuildUI(title, theme)
             task.wait(3); NotifyHolder:Destroy()
         end
     end
-  end
-    end
 
     function Window:CreateTab(name)
         local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = name; btn.TextColor3 = Color3.new(1,1,1); btn.BackgroundColor3 = Color3.fromRGB(40,40,40); Instance.new("UICorner", btn); Instance.new("UIStroke", btn).Color = Color3.new(1,1,1); btn.Font = Enum.Font.Gotham; btn.TextSize = 13
@@ -63,9 +88,6 @@ local function BuildUI(title, theme)
         local TabObj = {}
         local function AddStroke(obj) Instance.new("UIStroke", obj).Color = Color3.new(1,1,1) end
         
-        function TabObj:AddButton(t, cb) 
-            local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.9, 0, 0, 40); b.Text = t; b.TextColor3 = Color3.new(1,1,1); b.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", b); AddStroke(b); b.MouseButton1Click:Connect(cb) 
-        end
         function TabObj:AddButton(t, cb) local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.9, 0, 0, 40); b.Text = _T(t); b.TextColor3 = Color3.new(1,1,1); b.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", b); AddStroke(b); b.MouseButton1Click:Connect(cb) end
         function TabObj:AddToggle(t, cb) local s = false; local b = Instance.new("TextButton", TabFrame); b.Size = UDim2.new(0.9, 0, 0, 40); b.Text = _T(t); b.TextColor3 = Color3.new(1,1,1); b.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", b); AddStroke(b); b.MouseButton1Click:Connect(function() s = not s; b.BackgroundColor3 = s and Color3.fromRGB(0, 100, 255) or Color3.fromRGB(30,30,30); cb(s) end) end
         function TabObj:AddSlider(n, min, max, cb) local s = Instance.new("Frame", TabFrame); s.Size = UDim2.new(0.9, 0, 0, 50); s.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", s); AddStroke(s); local l = Instance.new("TextLabel", s); l.Size = UDim2.new(1,0,1,0); l.Text = _T(n); l.TextColor3 = Color3.new(1,1,1); l.BackgroundTransparency = 1; s.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then local c; c = UserInputService.InputChanged:Connect(function(inp) if inp.UserInputType==Enum.UserInputType.MouseMovement or inp.UserInputType==Enum.UserInputType.Touch then local p = math.clamp((inp.Position.X - s.AbsolutePosition.X)/s.AbsoluteSize.X, 0, 1); local v = math.floor(min + (max-min)*p); l.Text = _T(n)..": "..v; cb(v) end end); UserInputService.InputEnded:Connect(function(inp) if inp.UserInputType==Enum.UserInputType.MouseButton1 or inp.UserInputType==Enum.UserInputType.Touch then c:Disconnect() end end) end end) end
@@ -76,7 +98,7 @@ local function BuildUI(title, theme)
         return TabObj
     end
 
-    return Window -- Retorno correto da tabela Window
+    return Window
 end
 
 Library.Construct = BuildUI
