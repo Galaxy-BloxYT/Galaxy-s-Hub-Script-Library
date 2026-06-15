@@ -1,6 +1,19 @@
 local Library = {}
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
+local LocalizationService = game:GetService("LocalizationService")
+
+-- Adicionado a definição da função _T que estava faltando
+local function _T(text)
+    local success, translator = pcall(function()
+        return LocalizationService:GetTranslatorForLocaleAsync(LocalizationService.RobloxLocaleId)
+    end)
+    if success and translator then
+        local translation = translator:Translate(game, text)
+        return translation or text
+    end
+    return text
+end
 
 local function BuildUI(title, theme)
     local MainColor = (theme == "Emerald") and Color3.fromRGB(46, 204, 113) or Color3.fromRGB(0, 100, 255)
@@ -15,7 +28,6 @@ local function BuildUI(title, theme)
     local TopBar = Instance.new("Frame", Main); TopBar.Size = UDim2.new(1, 0, 0, 40); TopBar.BackgroundTransparency = 1
     local Txt = Instance.new("TextLabel", TopBar); Txt.Size = UDim2.new(1, -100, 1, 0); Txt.Position = UDim2.new(0, 10, 0, 0); Txt.Text = title; Txt.TextColor3 = Color3.new(1,1,1); Txt.Font = Enum.Font.GothamBold; Txt.TextSize = 16; Txt.BackgroundTransparency = 1; Txt.TextXAlignment = Enum.TextXAlignment.Left; Instance.new("UIStroke", Txt).Color = Color3.new(1,1,1)
     
-    -- Botões de Controle
     local CloseBtn = Instance.new("TextButton", TopBar); CloseBtn.Size = UDim2.new(0, 25, 0, 25); CloseBtn.Position = UDim2.new(1, -35, 0, 7); CloseBtn.Text = "X"; CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50); Instance.new("UICorner", CloseBtn); CloseBtn.MouseButton1Click:Connect(function() UI:Destroy() end)
     local MinBtn = Instance.new("TextButton", TopBar); MinBtn.Size = UDim2.new(0, 25, 0, 25); MinBtn.Position = UDim2.new(1, -65, 0, 7); MinBtn.Text = "-"; MinBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80); Instance.new("UICorner", MinBtn); MinBtn.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible end)
     
@@ -41,6 +53,7 @@ local function BuildUI(title, theme)
         end
     end
   end
+    end
 
     function Window:CreateTab(name)
         local btn = Instance.new("TextButton", Sidebar); btn.Size = UDim2.new(0.9, 0, 0, 35); btn.Text = name; btn.TextColor3 = Color3.new(1,1,1); btn.BackgroundColor3 = Color3.fromRGB(40,40,40); Instance.new("UICorner", btn); Instance.new("UIStroke", btn).Color = Color3.new(1,1,1); btn.Font = Enum.Font.Gotham; btn.TextSize = 13
@@ -60,10 +73,10 @@ local function BuildUI(title, theme)
         function TabObj:AddTextBox(n, p, cb) local t = Instance.new("TextBox", TabFrame); t.Size = UDim2.new(0.9, 0, 0, 40); t.PlaceholderText = _T(p); t.Text = ""; t.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", t); AddStroke(t); t.FocusLost:Connect(function() cb(t.Text) end) end
         function TabObj:AddLabel(t) local l = Instance.new("TextLabel", TabFrame); l.Text = _T(t); l.TextColor3 = Color3.new(1,1,1); l.BackgroundTransparency = 1 end
         function TabObj:AddColorSelection(n, default, cb) local s = Instance.new("Frame", TabFrame); s.Size = UDim2.new(0.9, 0, 0, 40); s.BackgroundColor3 = Color3.fromRGB(30,30,30); Instance.new("UICorner", s); AddStroke(s); local l = Instance.new("TextLabel", s); l.Size = UDim2.new(0.5, 0, 1, 0); l.Text = _T(n); l.TextColor3 = Color3.new(1,1,1); l.BackgroundTransparency = 1; local b = Instance.new("TextButton", s); b.Size = UDim2.new(0, 60, 0, 25); b.Position = UDim2.new(0.7, 0, 0.15, 0); b.Text = _T("Escolher"); b.BackgroundColor3 = Color3.fromRGB(40,40,40); Instance.new("UICorner", b); AddStroke(b); local cp = Instance.new("Frame", s); cp.Size = UDim2.new(0, 25, 0, 25); cp.Position = UDim2.new(0.6, 0, 0.15, 0); cp.BackgroundColor3 = default; Instance.new("UICorner", cp); AddStroke(cp); b.MouseButton1Click:Connect(function() cb(cp.BackgroundColor3) end) end
-        
         return TabObj
     end
-    return Window
+
+    return Window -- Retorno correto da tabela Window
 end
 
 Library.Construct = BuildUI
