@@ -1,3 +1,5 @@
+-- we're open sourced! you can adjust anything you want, or, remake the lib yourself!
+
 local Library = {}
 
 local TweenService = game:GetService("TweenService")
