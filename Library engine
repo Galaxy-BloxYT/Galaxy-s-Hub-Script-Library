@@ -285,10 +285,10 @@ local function BuildUI(title)
 	makeDraggable(TopBar, Main)
 
 	local minimized = false
-	local savedSize = Main.Size
+local savedSize = Main.Size
 
 MinimizeButton.MouseButton1Click:Connect(function()
-		minimized = not minimized
+	minimized = not minimized
 
 	if minimized then
 		savedSize = Main.Size
@@ -301,6 +301,7 @@ MinimizeButton.MouseButton1Click:Connect(function()
 		MinimizeButton.Text = "—"
 	end
 end)
+
 
 	CloseButton.MouseButton1Click:Connect(function()
 		UI:Destroy()
