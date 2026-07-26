@@ -135,7 +135,7 @@ local function addIndicator(text, parent)
 	return create("TextLabel", {
 		Name = "TypeIndicator",
 		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1, -8, 0.5, 0),
+		Position = UDim2.new(1, -4, 0.5, 0),
 		Size = UDim2.new(0, 64, 1, 0),
 		BackgroundTransparency = 1,
 		Text = text,
@@ -613,7 +613,7 @@ local function BuildUI(title)
 			local Switch = create("Frame", {
 				Name = "Switch",
 				AnchorPoint = Vector2.new(1, 0.5),
-				Position = UDim2.new(1, -10, 0.5, 0),
+				Position = UDim2.new(1, -4, 0.5, 0),
 				Size = UDim2.fromOffset(42, 22),
 				BackgroundColor3 = Color3.fromRGB(62, 62, 72),
 				BorderSizePixel = 0,
@@ -673,6 +673,134 @@ local function BuildUI(title)
 			controller.Instance = Toggle
 			return controller
 		end
+
+       			function TabObj:AddDropdown(text, options, defaultOption, callback)
+				options = options or {}
+				local selected = defaultOption or options[1] or ""
+				local opened = false
+
+				-- Botão principal do Dropdown
+				local DropdownButton = create("TextButton", {
+					Name = "Dropdown",
+					Size = UDim2.new(1, 0, 0, 38),
+					BackgroundColor3 = Color3.fromRGB(31, 31, 38),
+					BorderSizePixel = 0,
+					Text = "  " .. text,
+					TextColor3 = Color3.fromRGB(240, 240, 245),
+					TextSize = 13,
+					Font = Enum.Font.GothamMedium,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					AutoButtonColor = false,
+				}, TabFrame)
+				addCorner(DropdownButton, 7)
+				addStroke(DropdownButton, Color3.fromRGB(100, 100, 115), 1, 0.55)
+				addPadding(DropdownButton, 10, 10, 0, 0)
+
+				-- Indicador do valor atual / seta
+				local ValueIndicator = create("TextLabel", {
+					Name = "ValueIndicator",
+					AnchorPoint = Vector2.new(1, 0.5),
+					Position = UDim2.new(1, -8, 0.5, 0),
+					Size = UDim2.new(0, 120, 1, 0),
+					BackgroundTransparency = 1,
+					Text = tostring(selected) .. " ▾",
+					TextColor3 = Color3.fromRGB(145, 145, 155),
+					TextSize = 10,
+					Font = Enum.Font.Gotham,
+					TextXAlignment = Enum.TextXAlignment.Right,
+					ZIndex = 4,
+				}, DropdownButton)
+
+				-- Container da lista de opções (fica oculto inicialmente)
+				local ListContainer = create("ScrollingFrame", {
+					Name = "ListContainer",
+					Position = UDim2.new(0, 0, 1, 4),
+					Size = UDim2.new(1, 0, 0, 0),
+					BackgroundColor3 = Color3.fromRGB(25, 25, 31),
+					BorderSizePixel = 0,
+					CanvasSize = UDim2.new(0, 0, 0, 0),
+					AutomaticCanvasSize = Enum.AutomaticSize.Y,
+					ScrollBarThickness = 2,
+					Visible = false,
+					ZIndex = 5,
+				}, DropdownButton)
+				addCorner(ListContainer, 6)
+				addStroke(ListContainer, Color3.fromRGB(80, 80, 95), 1, 0.5)
+
+				local UIListLayout = create("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 2),
+				}, ListContainer)
+
+				local function updateList()
+					for _, child in ipairs(ListContainer:GetChildren()) do
+						if child:IsA("TextButton") then
+							child:Destroy()
+						end
+					end
+
+					local totalHeight = 0
+					for _, option in ipairs(options) do
+						local OptButton = create("TextButton", {
+							Size = UDim2.new(1, 0, 0, 30),
+							BackgroundColor3 = (option == selected) and Color3.fromRGB(40, 40, 50) or Color3.fromRGB(25, 25, 31),
+							BorderSizePixel = 0,
+							Text = "  " .. tostring(option),
+							TextColor3 = (option == selected) and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 180, 190),
+							TextSize = 12,
+							Font = Enum.Font.Gotham,
+							TextXAlignment = Enum.TextXAlignment.Left,
+							AutoButtonColor = false,
+							ZIndex = 6,
+						}, ListContainer)
+
+						OptButton.MouseButton1Click:Connect(function()
+							selected = option
+							ValueIndicator.Text = tostring(selected) .. " ▾"
+							opened = false
+							ListContainer.Visible = false
+							TweenService:Create(DropdownButton, TweenInfo.new(0.16), {Size = UDim2.new(1, 0, 0, 38)}):Play()
+							safeCallback(callback, selected)
+							updateList()
+						end)
+
+						totalHeight = totalHeight + 32
+					end
+
+					if opened then
+						local targetHeight = math.min(totalHeight, 120)
+						ListContainer.Size = UDim2.new(1, 0, 0, targetHeight)
+					end
+				end
+
+				DropdownButton.MouseButton1Click:Connect(function()
+					opened = not opened
+					ListContainer.Visible = opened
+					if opened then
+						updateList()
+						local targetHeight = math.min(#options * 32, 120)
+						TweenService:Create(DropdownButton, TweenInfo.new(0.16), {Size = UDim2.new(1, 0, 0, 38 + targetHeight + 6)}):Play()
+					else
+						TweenService:Create(DropdownButton, TweenInfo.new(0.16), {Size = UDim2.new(1, 0, 0, 38)}):Play()
+					end
+				end)
+
+				local controller = {}
+				function controller:Set(value)
+					if table.find(options, value) then
+						selected = value
+						ValueIndicator.Text = tostring(selected) .. " ▾"
+						safeCallback(callback, selected)
+					end
+				end
+				function controller:Get()
+					return selected
+				end
+
+				controller.Instance = DropdownButton
+				return controller
+			end
+
 
 		function TabObj:AddSlider(nameText, minimum, maximum, defaultOrCallback, callback)
 			minimum = tonumber(minimum) or 0
