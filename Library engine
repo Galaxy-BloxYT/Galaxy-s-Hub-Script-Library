@@ -290,17 +290,17 @@ local function BuildUI(title)
 MinimizeButton.MouseButton1Click:Connect(function()
 		minimized = not minimized
 
-		if minimized then
-			savedSize = Main.Size
-			Body.Visible = false
-			Main.Size = UDim2.new(savedSize.X.Scale, savedSize.X.Offset, 0, 42)
-			MinimizeButton.Text = "+"
-		else
-			Main.Size = savedSize
-			Body.Visible = true
-			MinimizeButton.Text = "—"
-		end
-	end)
+	if minimized then
+		savedSize = Main.Size
+		Body.Visible = false
+		Main.Size = UDim2.new(savedSize.X.Scale, savedSize.X.Offset, 0, 42)
+		MinimizeButton.Text = "+"
+	else
+		Main.Size = savedSize
+		Body.Visible = true
+		MinimizeButton.Text = "—"
+	end
+end)
 
 	CloseButton.MouseButton1Click:Connect(function()
 		UI:Destroy()
