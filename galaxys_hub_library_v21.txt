@@ -1,7 +1,3 @@
--- Galaxy's Hub Library
--- Fixed library version 21
--- Supports mouse and touch input.
-
 local Library = {}
 
 local TweenService = game:GetService("TweenService")
