@@ -288,7 +288,7 @@ local function BuildUI(title)
 local originalSize = Main.Size
 
 MinimizeButton.MouseButton1Click:Connect(function()
-    minimized = notMinimized
+    minimized = not minimized
     
     if minimized then
         originalSize = Main.Size
