@@ -293,19 +293,25 @@ MinimizeButton.MouseButton1Click:Connect(function()
     if minimized then
         originalSize = Main.Size
         Body.Visible = false
+        MinimizeButton.Text = "+"
         
-        TweenService:Create(Main, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, 0, 35)
-        }):Play()
+        if SizeConstraint then
+            SizeConstraint.MinSize = Vector2.new(SizeConstraint.MinSize.X, 0)
+        end
+        
+        Main.Size = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, 0, 42)
     else
-        TweenService:Create(Main, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-            Size = originalSize
-        }):Play()
-        
-        task.wait(0.05)
         Body.Visible = true
+        MinimizeButton.Text = "-"
+        
+        if SizeConstraint then
+            SizeConstraint.MinSize = Vector2.new(SizeConstraint.MinSize.X, 260) -- Coloque o valor original que tava antes (260)
+        end
+        
+        Main.Size = originalSize
     end
 end)
+
 
 	CloseButton.MouseButton1Click:Connect(function()
 		UI:Destroy()
