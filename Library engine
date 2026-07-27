@@ -964,9 +964,9 @@ BackgroundTransparency = 1,
         if multipleChoice then
             local list = {}
             for k, v in pairs(selectedItems) do if v then table.insert(list, k) end end
-            titleLabel.Text = dropdownName .. ": " .. (#list > 0 and table.concat(list, ", ") or "Nenhum")
+            titleLabel.Text = dropdownName .. ": " .. (#list > 0 and table.concat(list, ", ") or "None")
         else
-            titleLabel.Text = dropdownName .. ": " .. tostring(selectedItems or "Selecione")
+            titleLabel.Text = dropdownName .. ": " .. tostring(selectedItems or "Select")
         end
     end
     updateDisplay()
@@ -977,7 +977,7 @@ BackgroundTransparency = 1,
         optButton.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
         optButton.BorderSizePixel = 0
         optButton.Font = Enum.Font.Gotham
-        optButton.Text = "  " + optText
+        optButton.Text = "  " .. optText
         optButton.TextColor3 = (multipleChoice and selectedItems[optText]) and Color3.fromRGB(170, 0, 255) or Color3.fromRGB(200, 200, 200)
         optButton.TextSize = 13
         optButton.TextXAlignment = Enum.TextXAlignment.Left
