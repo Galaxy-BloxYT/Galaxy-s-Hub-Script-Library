@@ -896,6 +896,131 @@ BackgroundTransparency = 1,
 			return TextBox
 		end
 
+        function TabObj:AddDropdown(dropdownName, options, defaultOption, multipleChoice, callback)
+    local dropdownOpen = false
+    local selectedItems = {}
+    
+    if multipleChoice then
+        if type(defaultOption) == "table" then
+            for _, v in ipairs(defaultOption) do selectedItems[v] = true end
+        end
+    else
+        selectedItems = defaultOption or (options[1] and options[1])
+    end
+
+    local dropdownContainer = Instance.new("Frame")
+    dropdownContainer.Name = dropdownName .. "Dropdown"
+    dropdownContainer.Size = UDim2.new(1, 0, 0, 40)
+    dropdownContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    dropdownContainer.BorderSizePixel = 0
+    dropdownContainer.ClipsDescendants = true
+    dropdownContainer.Parent = self.Container
+    
+    Instance.new("UICorner", dropdownContainer).CornerRadius = UDim.new(0, 8)
+    local stroke = Instance.new("UIStroke", dropdownContainer)
+    stroke.Color = Color3.fromRGB(170, 0, 255)
+    stroke.Transparency = 0.5
+
+    local headerButton = Instance.new("TextButton")
+    headerButton.Size = UDim2.new(1, 0, 0, 40)
+    headerButton.BackgroundTransparency = 1
+    headerButton.Text = ""
+    headerButton.Parent = dropdownContainer
+
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(0.7, 0, 1, 0)
+    titleLabel.Position = UDim2.new(0, 12, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Font = Enum.Font.GothamMedium
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.TextSize = 14
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = headerButton
+
+    local arrowLabel = Instance.new("TextLabel")
+    arrowLabel.Size = UDim2.new(0, 30, 1, 0)
+    arrowLabel.Position = UDim2.new(1, -35, 0, 0)
+    arrowLabel.BackgroundTransparency = 1
+    arrowLabel.Font = Enum.Font.GothamBold
+    arrowLabel.Text = "+"
+    arrowLabel.TextColor3 = Color3.fromRGB(170, 0, 255)
+    arrowLabel.TextSize = 16
+    arrowLabel.Parent = headerButton
+
+    local optionsListFrame = Instance.new("ScrollingFrame")
+    optionsListFrame.Size = UDim2.new(1, -10, 0, 0)
+    optionsListFrame.Position = UDim2.new(0, 5, 0, 45)
+    optionsListFrame.BackgroundTransparency = 1
+    optionsListFrame.BorderSizePixel = 0
+    optionsListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+    optionsListFrame.ScrollBarThickness = 3
+    optionsListFrame.Parent = dropdownContainer
+
+    local uiList = Instance.new("UIListLayout", optionsListFrame)
+    uiList.SortOrder = Enum.SortOrder.LayoutOrder
+    uiList.Padding = UDim.new(0, 4)
+
+    local function updateDisplay()
+        if multipleChoice then
+            local list = {}
+            for k, v in pairs(selectedItems) do if v then table.insert(list, k) end end
+            titleLabel.Text = dropdownName .. ": " .. (#list > 0 and table.concat(list, ", ") or "Nenhum")
+        else
+            titleLabel.Text = dropdownName .. ": " .. tostring(selectedItems or "Selecione")
+        end
+    end
+    updateDisplay()
+
+    for _, optText in ipairs(options) do
+        local optButton = Instance.new("TextButton")
+        optButton.Size = UDim2.new(1, 0, 0, 30)
+        optButton.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
+        optButton.BorderSizePixel = 0
+        optButton.Font = Enum.Font.Gotham
+        optButton.Text = "  " + optText
+        optButton.TextColor3 = (multipleChoice and selectedItems[optText]) and Color3.fromRGB(170, 0, 255) or Color3.fromRGB(200, 200, 200)
+        optButton.TextSize = 13
+        optButton.TextXAlignment = Enum.TextXAlignment.Left
+        optButton.Parent = optionsListFrame
+        Instance.new("UICorner", optButton).CornerRadius = UDim.new(0, 6)
+
+        optButton.MouseButton1Click:Connect(function()
+            if multipleChoice then
+                selectedItems[optText] = not selectedItems[optText]
+                optButton.TextColor3 = selectedItems[optText] and Color3.fromRGB(170, 0, 255) or Color3.fromRGB(200, 200, 200)
+                
+                local resultTable = {}
+                for k, v in pairs(selectedItems) do if v then table.insert(resultTable, k) end end
+                callback(resultTable)
+            else
+                selectedItems = optText
+                dropdownOpen = false
+                
+                TweenService:Create(dropdownContainer, TweenInfo.new(0.3, Enum.EasingStyle.Sine), {Size = UDim2.new(1, 0, 0, 40)}):Play()
+                TweenService:Create(arrowLabel, TweenInfo.new(0.3), {Rotation = 0}):Play()
+                
+                callback(selectedItems)
+            end
+            updateDisplay()
+        end)
+    end
+
+    uiList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        optionsListFrame.CanvasSize = UDim2.new(0, 0, 0, uiList.AbsoluteContentSize.Y)
+    end)
+
+    headerButton.MouseButton1Click:Connect(function()
+        dropdownOpen = not dropdownOpen
+        local contentHeight = math.min(uiList.AbsoluteContentSize.Y + 10, 150)
+        local targetHeight = dropdownOpen and (45 + contentHeight) or 40
+        
+        TweenService:Create(dropdownContainer, TweenInfo.new(0.3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.new(1, 0, 0, targetHeight)}):Play()
+        TweenService:Create(arrowLabel, TweenInfo.new(0.3), {Rotation = dropdownOpen and 45 or 0}):Play()
+    end)
+    
+    return dropdownContainer
+end
+
 		function TabObj:AddColorSelection(nameText, defaultColor, callback)
 			local selectedColor = typeof(defaultColor) == "Color3"
 				and defaultColor
