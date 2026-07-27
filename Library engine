@@ -285,7 +285,20 @@ local function BuildUI(title)
 	makeDraggable(TopBar, Main)
 
 	local minimized = false
-local originalSize = Main.Size
+   local originalSize = Main.Size
+
+local DragBar = create("Frame", {
+    Name = "MinimizedDragBar",
+    Size = UDim2.new(0, 120, 0, 8), -- Tamanho de uma pílula/alça de arraste
+    Position = UDim2.new(0.5, -60, 1, 8), -- Posicionada logo abaixo do Main
+    BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+    BackgroundTransparency = 0.7,
+    BorderSizePixel = 0,
+    Visible = false, -- Começa oculta
+    ZIndex = 999,
+}, Main)
+
+addCorner(DragBar, 4)
 
 MinimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
@@ -300,19 +313,21 @@ MinimizeButton.MouseButton1Click:Connect(function()
         end
         
         Main.Size = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, 0, 42)
+        DragBar.Visible = true
     else
+        DragBar.Visible = false
         Body.Visible = true
         MinimizeButton.Text = "-"
         
         if SizeConstraint then
-            SizeConstraint.MinSize = Vector2.new(SizeConstraint.MinSize.X, 260) -- Coloque o valor original que tava antes (260)
+            SizeConstraint.MinSize = Vector2.new(SizeConstraint.MinSize.X, 260)
         end
         
         Main.Size = originalSize
     end
 end)
 
-
+ makeDraggable(DragBar)
 	CloseButton.MouseButton1Click:Connect(function()
 		UI:Destroy()
 	end)
