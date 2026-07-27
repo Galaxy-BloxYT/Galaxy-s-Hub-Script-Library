@@ -285,22 +285,27 @@ local function BuildUI(title)
 	makeDraggable(TopBar, Main)
 
 	local minimized = false
-	local savedSize = Main.Size
+local originalSize = Main.Size
 
 MinimizeButton.MouseButton1Click:Connect(function()
-		minimized = not minimized
-
-		if minimized then
-			savedSize = Main.Size
-			Body.Visible = false
-			Main.Size = UDim2.new(savedSize.X.Scale, savedSize.X.Offset, 0, 42)
-			MinimizeButton.Text = "+"
-		else
-			Main.Size = savedSize
-			Body.Visible = true
-			MinimizeButton.Text = "—"
-		end
-	end)
+    minimized = notMinimized
+    
+    if minimized then
+        originalSize = Main.Size
+        Body.Visible = false
+        
+        TweenService:Create(Main, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, 0, 35)
+        }):Play()
+    else
+        TweenService:Create(Main, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = originalSize
+        }):Play()
+        
+        task.wait(0.05)
+        Body.Visible = true
+    end
+end)
 
 	CloseButton.MouseButton1Click:Connect(function()
 		UI:Destroy()
