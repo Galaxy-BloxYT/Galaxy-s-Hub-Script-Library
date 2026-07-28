@@ -289,16 +289,17 @@ local function BuildUI(title)
 
 local DragBar = create("Frame", {
     Name = "MinimizedDragBar",
-    Size = UDim2.new(0, 120, 0, 8), -- Tamanho de uma pílula/alça de arraste
-    Position = UDim2.new(0.5, -60, 1, 8), -- Posicionada logo abaixo do Main
+    Size = UDim2.new(0, 120, 0, 8),
+    Position = UDim2.new(0.5, -60, 1, 8),
     BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-    BackgroundTransparency = 0.7,
+    BackgroundTransparency = 0.5,
     BorderSizePixel = 0,
-    Visible = false, -- Começa oculta
+    Visible = false,
     ZIndex = 999,
 }, Main)
 
 addCorner(DragBar, 4)
+makeDraggable(DragBar)
 
 MinimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
@@ -327,7 +328,6 @@ MinimizeButton.MouseButton1Click:Connect(function()
     end
 end)
 
- makeDraggable(DragBar)
 	CloseButton.MouseButton1Click:Connect(function()
 		UI:Destroy()
 	end)
