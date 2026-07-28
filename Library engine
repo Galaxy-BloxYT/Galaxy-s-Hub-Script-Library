@@ -896,7 +896,7 @@ BackgroundTransparency = 1,
 			return TextBox
 		end
 
-        			function TabObj:AddDropdown(text, options, defaultOption, isMultiple, callback)
+       			function TabObj:AddDropdown(text, options, defaultOption, isMultiple, callback)
 				options = options or {}
 				local multiple = isMultiple or false
 				local opened = false
@@ -912,97 +912,6 @@ BackgroundTransparency = 1,
 					selected = defaultOption or options[1] or ""
 				end
 
-				local DropdownButton = create("TextButton", {
-					Name = "Dropdown",
-					Size = UDim2.new(1, 0, 0, 38),
-					BackgroundColor3 = Color3.fromRGB(31, 31, 38),
-					BorderSizePixel = 0,
-					Text = "  " .. text,
-					TextColor3 = Color3.fromRGB(240, 240, 245),
-					TextSize = 13,
-					Font = Enum.Font.GothamMedium,
-					TextXAlignment = Enum.TextXAlignment.Left,
-					AutoButtonColor = false,
-					ZIndex = 3,
-				}, TabFrame)
-				addCorner(DropdownButton, 7)
-				addStroke(DropdownButton, Color3.fromRGB(100, 100, 115), 1, 0.55)
-				addPadding(DropdownButton, 10, 10, 0, 0)
-
-				local function getDisplayText()
-					if multiple then
-						if #selected == 0 then
-							return "None ▾"
-						elseif #selected == 1 then
-							return tostring(selected[1]) .. " ▾"
-						else
-							return tostring(#selected) .. " selected ▾"
-						end
-					else
-						return tostring(selected) .. " ▾"
-					end
-				end
-
-				local ValueIndicator = create("TextLabel", {
-					Name = "ValueIndicator",
-					AnchorPoint = Vector2.new(1, 0.5),
-					Position = UDim2.new(1, -8, 0.5, 0),
-					Size = UDim2.new(0, 140, 1, 0),
-					BackgroundTransparency = 1,
-					Text = getDisplayText(),
-					TextColor3 = Color3.fromRGB(145, 145, 155),
-					TextSize = 10,
-					Font = Enum.Font.Gotham,
-					TextXAlignment = Enum.TextXAlignment.Right,
-					ZIndex = 4,
-				}, DropdownButton)
-
-				local ListContainer = create("ScrollingFrame", {
-					Name = "ListContainer",
-					Position = UDim2.new(0, 0, 1, 4),
-					Size = UDim2.new(1, 0, 0, 0),
-					BackgroundColor3 = Color3.fromRGB(25, 25, 31),
-					BorderSizePixel = 0,
-					CanvasSize = UDim2.new(0, 0, 0, 0),
-					AutomaticCanvasSize = Enum.AutomaticSize.Y,
-					ScrollBarThickness = 2,
-					Visible = false,
-					ZIndex = 10,
-				}, DropdownButton)
-				addCorner(ListContainer, 6)
-				addStroke(ListContainer, Color3.fromRGB(80, 80, 95), 1, 0.5)
-
-				create("UIListLayout", {
-					SortOrder = Enum.SortOrder.LayoutOrder,
-					Padding = UDim.new(0, 2),
-				}, ListContainer)
-
-				local function isSelected(option)
-					if multiple then
-						for _, v in ipairs(selected) do
-							if v == option then return true end
-						end
-						return false
-					else
-						return selected == option
-					end
-			function TabObj:AddDropdown(text, options, defaultOption, isMultiple, callback)
-				options = options or {}
-				local multiple = isMultiple or false
-				local opened = false
-
-				local selected = {}
-				if multiple then
-					if type(defaultOption) == "table" then
-						for _, v in ipairs(defaultOption) do table.insert(selected, v) end
-					elseif defaultOption ~= nil then
-						table.insert(selected, defaultOption)
-					end
-				else
-					selected = defaultOption or options[1] or ""
-				end
-
-				-- Holder principal do Dropdown (para empurrar os elementos vizinhos via UIListLayout)
 				local DropdownHolder = create("Frame", {
 					Name = "DropdownHolder",
 					Size = UDim2.new(1, 0, 0, 38),
@@ -1022,11 +931,11 @@ BackgroundTransparency = 1,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					AutoButtonColor = false,
 				}, DropdownHolder)
-				addCorner(DropdownButton, 7)
-				addStroke(DropdownButton, Color3.fromRGB(100, 100, 115), 1, 0.55)
-				addPadding(DropdownButton, 10, 10, 0, 0)
+				
+				if type(addCorner) == "function" then addCorner(DropdownButton, 7) end
+				if type(addStroke) == "function" then addStroke(DropdownButton, Color3.fromRGB(100, 100, 115), 1, 0.55) end
+				if type(addPadding) == "function" then addPadding(DropdownButton, 10, 10, 0, 0) end
 
-				-- Adiciona o indicador padrão da engine para sinalizar o tipo de componente
 				if type(TabObj.AddIndicator) == "function" then
 					TabObj:AddIndicator(DropdownButton, "Dropdown")
 				end
@@ -1044,7 +953,7 @@ BackgroundTransparency = 1,
 				local ValueIndicator = create("TextLabel", {
 					Name = "ValueIndicator",
 					AnchorPoint = Vector2.new(1, 0.5),
-					Position = UDim2.new(1, -25, 0.5, 0), -- Ajustado para dar espaço ao indicator da engine
+					Position = UDim2.new(1, -25, 0.5, 0),
 					Size = UDim2.new(0, 130, 1, 0),
 					BackgroundTransparency = 1,
 					Text = getDisplayText(),
@@ -1054,7 +963,6 @@ BackgroundTransparency = 1,
 					TextXAlignment = Enum.TextXAlignment.Right,
 				}, DropdownButton)
 
-				-- Container da lista e da busca
 				local ListContainer = create("Frame", {
 					Name = "ListContainer",
 					Position = UDim2.new(0, 0, 0, 42),
@@ -1063,10 +971,10 @@ BackgroundTransparency = 1,
 					BorderSizePixel = 0,
 					Visible = false,
 				}, DropdownHolder)
-				addCorner(ListContainer, 6)
-				addStroke(ListContainer, Color3.fromRGB(80, 80, 95), 1, 0.5)
+				
+				if type(addCorner) == "function" then addCorner(ListContainer, 6) end
+				if type(addStroke) == "function" then addStroke(ListContainer, Color3.fromRGB(80, 80, 95), 1, 0.5) end
 
-				-- Barra de Pesquisa (Search Bar)
 				local SearchBox = create("TextBox", {
 					Name = "SearchBox",
 					Size = UDim2.new(1, -12, 0, 28),
@@ -1081,10 +989,10 @@ BackgroundTransparency = 1,
 					Font = Enum.Font.Gotham,
 					ClearTextOnFocus = false,
 				}, ListContainer)
-				addCorner(SearchBox, 5)
-				addPadding(SearchBox, 8, 8, 0, 0)
+				
+				if type(addCorner) == "function" then addCorner(SearchBox, 5) end
+				if type(addPadding) == "function" then addPadding(SearchBox, 8, 8, 0, 0) end
 
-				-- ScrollingFrame interno para as opções filtradas
 				local OptionsScroll = create("ScrollingFrame", {
 					Name = "OptionsScroll",
 					Position = UDim2.new(0, 4, 0, 38),
@@ -1145,13 +1053,12 @@ BackgroundTransparency = 1,
 
 									ValueIndicator.Text = getDisplayText()
 									buildOptions()
-									safeCallback(callback, selected)
+									if type(safeCallback) == "function" then safeCallback(callback, selected) end
 								else
 									selected = option
 									ValueIndicator.Text = getDisplayText()
 									opened = false
 									
-									-- Animação suave para fechar
 									TweenService:Create(DropdownHolder, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 										Size = UDim2.new(1, 0, 0, 38)
 									}):Play()
@@ -1161,7 +1068,7 @@ BackgroundTransparency = 1,
 									task.delay(0.2, function() ListContainer.Visible = false end)
 
 									buildOptions()
-									safeCallback(callback, selected)
+									if type(safeCallback) == "function" then safeCallback(callback, selected) end
 								end
 							end)
 						end
@@ -1186,7 +1093,6 @@ BackgroundTransparency = 1,
 						SearchBox.Text = ""
 						buildOptions()
 
-						-- Animação suave para abrir e empurrar os vizinhos
 						TweenService:Create(DropdownHolder, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 							Size = UDim2.new(1, 0, 0, targetHolderHeight)
 						}):Play()
@@ -1194,7 +1100,6 @@ BackgroundTransparency = 1,
 							Size = UDim2.new(1, 0, 0, targetListHeight)
 						}):Play()
 					else
-						-- Animação suave para fechar
 						TweenService:Create(DropdownHolder, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
 							Size = UDim2.new(1, 0, 0, 38)
 						}):Play()
@@ -1215,14 +1120,14 @@ BackgroundTransparency = 1,
 							for _, v in ipairs(value) do table.insert(selected, v) end
 							ValueIndicator.Text = getDisplayText()
 							buildOptions()
-							safeCallback(callback, selected)
+							if type(safeCallback) == "function" then safeCallback(callback, selected) end
 						end
 					else
 						if table.find(options, value) then
 							selected = value
 							ValueIndicator.Text = getDisplayText()
 							buildOptions()
-							safeCallback(callback, selected)
+							if type(safeCallback) == "function" then safeCallback(callback, selected) end
 						end
 					end
 				end
@@ -1233,8 +1138,6 @@ BackgroundTransparency = 1,
 				controller.Instance = DropdownHolder
 				return controller
 			end
-
-
 
 
 		function TabObj:AddColorSelection(nameText, defaultColor, callback)
