@@ -299,7 +299,7 @@ local DragBar = create("Frame", {
 }, Main)
 
 addCorner(DragBar, 4)
-makeDraggable(DragBar)
+makeDraggable(DragBar, Main)
 
 MinimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
