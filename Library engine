@@ -986,79 +986,224 @@ BackgroundTransparency = 1,
 					else
 						return selected == option
 					end
+			function TabObj:AddDropdown(text, options, defaultOption, isMultiple, callback)
+				options = options or {}
+				local multiple = isMultiple or false
+				local opened = false
+
+				local selected = {}
+				if multiple then
+					if type(defaultOption) == "table" then
+						for _, v in ipairs(defaultOption) do table.insert(selected, v) end
+					elseif defaultOption ~= nil then
+						table.insert(selected, defaultOption)
+					end
+				else
+					selected = defaultOption or options[1] or ""
 				end
 
-				local updateList
+				-- Holder principal do Dropdown (para empurrar os elementos vizinhos via UIListLayout)
+				local DropdownHolder = create("Frame", {
+					Name = "DropdownHolder",
+					Size = UDim2.new(1, 0, 0, 38),
+					BackgroundTransparency = 1,
+					ClipsDescendants = true,
+				}, TabFrame)
+
+				local DropdownButton = create("TextButton", {
+					Name = "Dropdown",
+					Size = UDim2.new(1, 0, 0, 38),
+					BackgroundColor3 = Color3.fromRGB(31, 31, 38),
+					BorderSizePixel = 0,
+					Text = "  " .. text,
+					TextColor3 = Color3.fromRGB(240, 240, 245),
+					TextSize = 13,
+					Font = Enum.Font.GothamMedium,
+					TextXAlignment = Enum.TextXAlignment.Left,
+					AutoButtonColor = false,
+				}, DropdownHolder)
+				addCorner(DropdownButton, 7)
+				addStroke(DropdownButton, Color3.fromRGB(100, 100, 115), 1, 0.55)
+				addPadding(DropdownButton, 10, 10, 0, 0)
+
+				-- Adiciona o indicador padrão da engine para sinalizar o tipo de componente
+				if type(TabObj.AddIndicator) == "function" then
+					TabObj:AddIndicator(DropdownButton, "Dropdown")
+				end
+
+				local function getDisplayText()
+					if multiple then
+						if #selected == 0 then return "None ▾"
+						elseif #selected == 1 then return tostring(selected[1]) .. " ▾"
+						else return tostring(#selected) .. " selected ▾" end
+					else
+						return tostring(selected) .. " ▾"
+					end
+				end
+
+				local ValueIndicator = create("TextLabel", {
+					Name = "ValueIndicator",
+					AnchorPoint = Vector2.new(1, 0.5),
+					Position = UDim2.new(1, -25, 0.5, 0), -- Ajustado para dar espaço ao indicator da engine
+					Size = UDim2.new(0, 130, 1, 0),
+					BackgroundTransparency = 1,
+					Text = getDisplayText(),
+					TextColor3 = Color3.fromRGB(145, 145, 155),
+					TextSize = 10,
+					Font = Enum.Font.Gotham,
+					TextXAlignment = Enum.TextXAlignment.Right,
+				}, DropdownButton)
+
+				-- Container da lista e da busca
+				local ListContainer = create("Frame", {
+					Name = "ListContainer",
+					Position = UDim2.new(0, 0, 0, 42),
+					Size = UDim2.new(1, 0, 0, 0),
+					BackgroundColor3 = Color3.fromRGB(25, 25, 31),
+					BorderSizePixel = 0,
+					Visible = false,
+				}, DropdownHolder)
+				addCorner(ListContainer, 6)
+				addStroke(ListContainer, Color3.fromRGB(80, 80, 95), 1, 0.5)
+
+				-- Barra de Pesquisa (Search Bar)
+				local SearchBox = create("TextBox", {
+					Name = "SearchBox",
+					Size = UDim2.new(1, -12, 0, 28),
+					Position = UDim2.new(0, 6, 0, 6),
+					BackgroundColor3 = Color3.fromRGB(35, 35, 42),
+					BorderSizePixel = 0,
+					PlaceholderText = "Search options...",
+					PlaceholderColor3 = Color3.fromRGB(120, 120, 130),
+					Text = "",
+					TextColor3 = Color3.fromRGB(240, 240, 245),
+					TextSize = 11,
+					Font = Enum.Font.Gotham,
+					ClearTextOnFocus = false,
+				}, ListContainer)
+				addCorner(SearchBox, 5)
+				addPadding(SearchBox, 8, 8, 0, 0)
+
+				-- ScrollingFrame interno para as opções filtradas
+				local OptionsScroll = create("ScrollingFrame", {
+					Name = "OptionsScroll",
+					Position = UDim2.new(0, 4, 0, 38),
+					Size = UDim2.new(1, -8, 1, -44),
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					CanvasSize = UDim2.new(0, 0, 0, 0),
+					AutomaticCanvasSize = Enum.AutomaticSize.Y,
+					ScrollBarThickness = 2,
+				}, ListContainer)
+
+				create("UIListLayout", {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 2),
+				}, OptionsScroll)
+
+				local filterText = ""
+
+				local function isSelected(option)
+					if multiple then
+						for _, v in ipairs(selected) do if v == option then return true end end
+						return false
+					else
+						return selected == option
+					end
+				end
 
 				local function buildOptions()
-					for _, child in ipairs(ListContainer:GetChildren()) do
-						if child:IsA("TextButton") then
-							child:Destroy()
-						end
+					for _, child in ipairs(OptionsScroll:GetChildren()) do
+						if child:IsA("TextButton") then child:Destroy() end
 					end
 
-					local totalHeight = 0
 					for _, option in ipairs(options) do
-						local active = isSelected(option)
-						
-						local OptButton = create("TextButton", {
-							Size = UDim2.new(1, 0, 0, 30),
-							BackgroundColor3 = active and Color3.fromRGB(45, 45, 60) or Color3.fromRGB(25, 25, 31),
-							BorderSizePixel = 0,
-							Text = "  " .. (multiple and (active and "[✓] " or "[ ] ") or "") .. tostring(option),
-							TextColor3 = active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 180, 190),
-							TextSize = 12,
-							Font = Enum.Font.Gotham,
-							TextXAlignment = Enum.TextXAlignment.Left,
-							AutoButtonColor = false,
-							ZIndex = 11,
-						}, ListContainer)
+						local strOpt = tostring(option)
+						if filterText == "" or string.find(string.lower(strOpt), string.lower(filterText)) then
+							local active = isSelected(option)
 
-						OptButton.MouseButton1Click:Connect(function()
-							if multiple then
-								local foundIndex = nil
-								for i, v in ipairs(selected) do
-									if v == option then
-										foundIndex = i
-										break
+							local OptButton = create("TextButton", {
+								Size = UDim2.new(1, 0, 0, 28),
+								BackgroundColor3 = active and Color3.fromRGB(45, 45, 60) or Color3.fromRGB(25, 25, 31),
+								BorderSizePixel = 0,
+								Text = "  " .. (multiple and (active and "[✓] " or "[ ] ") or "") .. strOpt,
+								TextColor3 = active and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(180, 180, 190),
+								TextSize = 12,
+								Font = Enum.Font.Gotham,
+								TextXAlignment = Enum.TextXAlignment.Left,
+								AutoButtonColor = false,
+							}, OptionsScroll)
+
+							OptButton.MouseButton1Click:Connect(function()
+								if multiple then
+									local foundIndex = nil
+									for i, v in ipairs(selected) do
+										if v == option then foundIndex = i; break; end
 									end
-								end
-								
-								if foundIndex then
-									table.remove(selected, foundIndex)
+									if foundIndex then table.remove(selected, foundIndex)
+									else table.insert(selected, option) end
+
+									ValueIndicator.Text = getDisplayText()
+									buildOptions()
+									safeCallback(callback, selected)
 								else
-									table.insert(selected, option)
+									selected = option
+									ValueIndicator.Text = getDisplayText()
+									opened = false
+									
+									-- Animação suave para fechar
+									TweenService:Create(DropdownHolder, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+										Size = UDim2.new(1, 0, 0, 38)
+									}):Play()
+									TweenService:Create(ListContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+										Size = UDim2.new(1, 0, 0, 0)
+									}):Play()
+									task.delay(0.2, function() ListContainer.Visible = false end)
+
+									buildOptions()
+									safeCallback(callback, selected)
 								end
-								
-								ValueIndicator.Text = getDisplayText()
-								buildOptions()
-								safeCallback(callback, selected)
-							else
-								selected = option
-								ValueIndicator.Text = getDisplayText()
-								opened = false
-								ListContainer.Visible = false
-								buildOptions()
-								safeCallback(callback, selected)
-							end
-						end)
-
-						totalHeight = totalHeight + 32
-					end
-
-					if opened then
-						local targetHeight = math.min(totalHeight, 130)
-						ListContainer.Size = UDim2.new(1, 0, 0, targetHeight)
+							end)
+						end
 					end
 				end
 
-				updateList = buildOptions
+				SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+					filterText = SearchBox.Text
+					buildOptions()
+				end)
 
 				DropdownButton.MouseButton1Click:Connect(function()
 					opened = not opened
-					ListContainer.Visible = opened
+					
+					local visibleItemsCount = math.min(#options, 4)
+					local targetListHeight = (visibleItemsCount * 30) + 44
+					local targetHolderHeight = 38 + targetListHeight + 6
+
 					if opened then
-						updateList()
+						ListContainer.Visible = true
+						filterText = ""
+						SearchBox.Text = ""
+						buildOptions()
+
+						-- Animação suave para abrir e empurrar os vizinhos
+						TweenService:Create(DropdownHolder, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+							Size = UDim2.new(1, 0, 0, targetHolderHeight)
+						}):Play()
+						TweenService:Create(ListContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+							Size = UDim2.new(1, 0, 0, targetListHeight)
+						}):Play()
+					else
+						-- Animação suave para fechar
+						TweenService:Create(DropdownHolder, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+							Size = UDim2.new(1, 0, 0, 38)
+						}):Play()
+						TweenService:Create(ListContainer, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+							Size = UDim2.new(1, 0, 0, 0)
+						}):Play()
+						task.delay(0.2, function()
+							if not opened then ListContainer.Visible = false end
+						end)
 					end
 				end)
 
@@ -1069,14 +1214,14 @@ BackgroundTransparency = 1,
 							selected = {}
 							for _, v in ipairs(value) do table.insert(selected, v) end
 							ValueIndicator.Text = getDisplayText()
-							updateList()
+							buildOptions()
 							safeCallback(callback, selected)
 						end
 					else
 						if table.find(options, value) then
 							selected = value
 							ValueIndicator.Text = getDisplayText()
-							updateList()
+							buildOptions()
 							safeCallback(callback, selected)
 						end
 					end
@@ -1085,9 +1230,10 @@ BackgroundTransparency = 1,
 					return selected
 				end
 
-				controller.Instance = DropdownButton
+				controller.Instance = DropdownHolder
 				return controller
 			end
+
 
 
 
