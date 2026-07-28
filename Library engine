@@ -287,19 +287,24 @@ local function BuildUI(title)
 	local minimized = false
    local originalSize = Main.Size
 
-local DragBar = create("Frame", {
-    Name = "MinimizedDragBar",
-    Size = UDim2.new(0, 120, 0, 8),
-    Position = UDim2.new(0.5, -60, 1, 8),
-    BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-    BackgroundTransparency = 0.5,
-    BorderSizePixel = 0,
-    Visible = false,
-    ZIndex = 999,
-}, Main)
+local DragBar = Instance.new("TextButton")
+DragBar.Name = "DragBar"
+DragBar.Size = UDim2.new(1, 0, 0, 24)
+DragBar.Position = UDim2.new(0, 0, 1, -24)
+DragBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+DragBar.BackgroundTransparency = 0.4
+DragBar.Text = "— Drag —"
+DragBar.TextColor3 = Color3.fromRGB(180, 180, 180)
+DragBar.TextSize = 12
+DragBar.Font = Enum.Font.SourceSansBold
+DragBar.AutoButtonColor = false
+DragBar.Visible = false
+DragBar.Parent = Main
 
-addCorner(DragBar, 4)
-makeDraggable(DragBar, Main)
+if type(makeDraggable) == "function" then
+    makeDraggable(DragBar, Main)
+end
+
 
 MinimizeButton.MouseButton1Click:Connect(function()
     minimized = not minimized
