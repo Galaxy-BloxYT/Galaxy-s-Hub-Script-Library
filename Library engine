@@ -509,7 +509,7 @@ end)
 		return true
 	end
 
-	function Window:CreateTab(name)
+		function Window:CreateTab(name)
 		local tabName = _T(name ~= nil and name or ("Tab " .. tostring(#self._tabs + 1)))
 
 		local TabButton = create("TextButton", {
