@@ -1609,6 +1609,8 @@ function KeySystem.Start(customConfig, customTitle)
     return true
 end
 
+    return KeySystem
+
 		if not self._currentTab then
 			self:SelectTab(TabObj)
 		end
@@ -1621,7 +1623,6 @@ end
 
 Library.Construct = BuildUI
 Library.CreateWindow = BuildUI
-return KeySystem
 
 return Library
 
