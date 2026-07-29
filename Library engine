@@ -6,6 +6,7 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
 
 local function _T(value)
 	return tostring(value or "")
@@ -1430,7 +1431,7 @@ local function getHWID()
     return hwid
 end
 
-function KeySystem.Start(customConfig)
+function KeySystem.Start(customConfig, customTitle)
     local config = {
         UseKeySystem = customConfig and customConfig.UseKeySystem or true,
         KeyType = customConfig and customConfig.KeyType or "Dynamic",
@@ -1440,6 +1441,8 @@ function KeySystem.Start(customConfig)
         MaxKeyUsesPerDay = customConfig and customConfig.MaxKeyUsesPerDay or 50,
         Whitelist = customConfig and customConfig.Whitelist or {}
     }
+
+    local windowTitle = customTitle or "Untitled | Key System"
 
     local function isWhitelisted()
         if not config.UseKeySystem then return true end
@@ -1470,7 +1473,7 @@ function KeySystem.Start(customConfig)
         end)
         
         if data.uses >= config.MaxKeyUsesPerDay then
-            return false, "Daily limit exceeded:(" .. config.MaxKeyUsesPerDay .. " used.)."
+            return false, "Daily limit exceeded: (" .. config.MaxKeyUsesPerDay .. " used.)."
         end
         
         data.uses = data.uses + 1
@@ -1488,7 +1491,7 @@ function KeySystem.Start(customConfig)
         if inputKey ~= targetKey then return false, "Incorrect Key!" end
         local allowed, msg = checkAndUpdateKeyUsage(inputKey)
         if not allowed then return false, msg end
-        return true, "Sucess!"
+        return true, "Success!"
     end
 
     local function tryAutoLogin()
@@ -1532,7 +1535,7 @@ function KeySystem.Start(customConfig)
     Title.Size = UDim2.new(1, 0, 0, 40)
     Title.Position = UDim2.new(0, 0, 0, 10)
     Title.BackgroundTransparency = 1
-    Title.Text = "Hub Name | Key System"
+    Title.Text = windowTitle
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.TextSize = 14
     Title.Font = Enum.Font.GothamBold
@@ -1589,8 +1592,8 @@ function KeySystem.Start(customConfig)
         local generated = (config.KeyType == "Static") and config.StaticKey or getDynamicKey()
         if setclipboard then
             setclipboard(generated)
-            CopyBtn.Text = "Copiado para a área de transferência!"
-            task.delay(2, function() CopyBtn.Text = "Copiar Key do Dia" end)
+            CopyBtn.Text = "Copied!"
+            task.delay(2, function() CopyBtn.Text = "Copy" end)
         else
             TextBox.Text = generated
         end
@@ -1603,7 +1606,7 @@ function KeySystem.Start(customConfig)
             keyVerified = true
         else
             SubmitBtn.Text = msg
-            task.delay(2, function() SubmitBtn.Text = "Verificar Key" end)
+            task.delay(2, function() SubmitBtn.Text = "Check Key" end)
         end
     end)
 
@@ -1612,6 +1615,8 @@ function KeySystem.Start(customConfig)
 end
 
 return KeySystem
+
+
 
 
 		if not self._currentTab then
