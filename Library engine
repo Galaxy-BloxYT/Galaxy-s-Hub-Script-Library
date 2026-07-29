@@ -157,7 +157,6 @@ local function BuildUI(title)
 	if existingUI then
 		existingUI:Destroy()
 	end
-   end
 
 	local UI = create("ScreenGui", {
 		Name = "GSHUBLIB",
