@@ -157,6 +157,7 @@ local function BuildUI(title)
 	if existingUI then
 		existingUI:Destroy()
 	end
+   end
 
 	local UI = create("ScreenGui", {
 		Name = "GSHUBLIB",
@@ -1625,4 +1626,4 @@ Library.Construct = BuildUI
 Library.CreateWindow = BuildUI
 
 return Library
-end
+
