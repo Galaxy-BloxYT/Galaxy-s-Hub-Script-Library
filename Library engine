@@ -1508,7 +1508,7 @@ function KeySystem.Start(customConfig, customTitle)
 
     local keyVerified = false
 
-    if CoreGui:FindFirstChild("GalaxysKeySystemGui") then CoreGui.GalaxysKeySystemGui:Destroy() end
+    if CoreGui:FindFirstChild("GalaxysHubCustomKeySystemGui") then CoreGui.GalaxysKeySystemGui:Destroy() end
     
     local KeyGui = Instance.new("ScreenGui")
     KeyGui.Name = "GalaxysKeySystemGui"
