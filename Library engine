@@ -1621,7 +1621,7 @@ end
 
 Library.Construct = BuildUI
 Library.CreateWindow = BuildUI
-return KeySystem = KeySystem
+return KeySystem
 
 return Library
 
