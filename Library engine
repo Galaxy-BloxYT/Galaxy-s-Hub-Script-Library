@@ -1617,6 +1617,7 @@ return KeySystem
 
 		return TabObj
 	end
+end)
 
 	return Window
 end
