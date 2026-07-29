@@ -1610,7 +1610,7 @@ function KeySystem.Start(customConfig, customTitle)
 end
 
 return KeySystem
-
+end
 		if not self._currentTab then
 			self:SelectTab(TabObj)
 		end
