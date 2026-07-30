@@ -900,6 +900,11 @@ BackgroundTransparency = 1,
 			return TextBox
 		end
 
+local Library = {}
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local Player = Players.LocalPlayer
+
 local function getGuiParent()
     if gethui then
         return gethui()
@@ -913,28 +918,25 @@ local function getGuiParent()
     end
 end
 
-
 function Library:InitKeySystem(config)
     config = config or {}
-    
     
     if config.UseKeySystem == false then
         return true
     end
 
-    
     if config.Whitelist and type(config.Whitelist) == "table" then
         local userId = Player.UserId
         local success, hwid = pcall(function() return gethwid and gethwid() end)
         
         for _, id in ipairs(config.Whitelist) do
             if id == userId or (success and id == hwid) then
-                return true -- Tá na whitelist? Passa direto sem chave!
+                return true
             end
         end
     end
 
-    local KeySystemTitle = config.KeySystemTitle or "My Incredible Hub! | Key System"
+    local KeySystemTitle = config.KeySystemTitle or "Untitled | Key System"
     local KeyType = config.KeyType or "Dynamic"
     local FileName = config.FileName or "GalaxysHubLib_Key.string"
     local StaticKeyBase = config.StaticKeyBase or "KEY-"
@@ -946,7 +948,7 @@ function Library:InitKeySystem(config)
         return success and hwid or tostring(Player.UserId)
     end
 
-        local function GenerateKey()
+    local function GenerateKey()
         if KeyType == "Static" then
             return StaticKeyBase .. GetHWID()
         else
@@ -960,7 +962,6 @@ function Library:InitKeySystem(config)
             return "GALAXY-" .. key
         end
     end
-
 
     local CurrentGeneratedKey = GenerateKey()
 
@@ -999,7 +1000,7 @@ function Library:InitKeySystem(config)
     MainFrame.Position = UDim2.new(0.5, -200, 0.5, -130)
     MainFrame.Size = UDim2.new(0, 400, 0, 260)
 
-    addCorner(MainFrame, 10)
+    addCorner(MainFrame, 20)
     addStroke(MainFrame)
 
     local TitleLabel = Instance.new("TextLabel")
@@ -1018,7 +1019,7 @@ function Library:InitKeySystem(config)
     SubTitle.Position = UDim2.new(0, 0, 0, 38)
     SubTitle.Size = UDim2.new(1, 0, 0, 20)
     SubTitle.Font = Enum.Font.Gotham
-    SubTitle.Text = "Input your key to continue..."
+    SubTitle.Text = "Input your key to continue."
     SubTitle.TextColor3 = Color3.fromRGB(130, 130, 160)
     SubTitle.TextSize = 12
 
@@ -1029,13 +1030,13 @@ function Library:InitKeySystem(config)
     KeyBox.Size = UDim2.new(0.8, 0, 0, 45)
     KeyBox.ClearTextOnFocus = false
     KeyBox.Font = Enum.Font.Code
-    KeyBox.PlaceholderText = "Key here..."
+    KeyBox.PlaceholderText = "Input your key here..."
     KeyBox.PlaceholderColor3 = Color3.fromRGB(80, 80, 110)
     KeyBox.Text = savedKey or ""
     KeyBox.TextColor3 = Color3.fromRGB(0, 242, 255)
     KeyBox.TextSize = 14
 
-    addCorner(KeyBox, 6)
+    addCorner(KeyBox)
     addStroke(KeyBox)
 
     local CheckBtn = Instance.new("TextButton")
@@ -1061,8 +1062,15 @@ function Library:InitKeySystem(config)
     GetKeyBtn.Text = "GET KEY"
     GetKeyBtn.TextColor3 = Color3.fromRGB(0, 242, 255)
     GetKeyBtn.TextSize = 13
-    addStroke(GetKeyBtn)
-    addCorner(GetKeyBtn)
+
+    local GetCorner = Instance.new("UICorner")
+    GetCorner.CornerRadius = UDim.new(0, 6)
+    GetCorner.Parent = GetKeyBtn
+
+    local GetStroke = Instance.new("UIStroke")
+    GetStroke.Parent = GetKeyBtn
+    GetStroke.Color = Color3.fromRGB(0, 242, 255)
+    GetStroke.Thickness = 1
 
     local StatusLabel = Instance.new("TextLabel")
     StatusLabel.Parent = MainFrame
@@ -1086,7 +1094,7 @@ function Library:InitKeySystem(config)
             isVerified = true
         else
             StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-            StatusLabel.Text = "Error: Incorrect key or key is expired!"
+            StatusLabel.Text = "Error!: incorrect Key or Key is expired!"
         end
     end)
 
@@ -1099,7 +1107,7 @@ function Library:InitKeySystem(config)
         
         while countdown > 0 do
             StatusLabel.TextColor3 = Color3.fromRGB(0, 242, 255)
-            StatusLabel.Text = "Aguarde o Captcha... (" .. countdown .. "s)"
+            StatusLabel.Text = "Wait, we're  verifying if you're not a bot... (" .. countdown .. "s)"
             task.wait(1)
             countdown = countdown - 1
         end
@@ -1107,7 +1115,7 @@ function Library:InitKeySystem(config)
         KeyBox.Text = CurrentGeneratedKey
         SaveKey(CurrentGeneratedKey)
         StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 120)
-        StatusLabel.Text = "Key gerada e salva com sucesso!"
+        StatusLabel.Text = "Key generated!"
         GetKeyBtn.Active = true
         isGenerating = false
     end)
@@ -1115,6 +1123,14 @@ function Library:InitKeySystem(config)
     repeat task.wait() until isVerified
     return true
 end
+
+function Library:CreateWindow(title)
+    local Window = {}
+    return Window
+end
+
+return Library
+
 
        			function TabObj:AddDropdown(text, options, defaultOption, isMultiple, callback)
 			options = options or {}
