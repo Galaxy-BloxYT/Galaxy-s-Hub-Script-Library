@@ -191,7 +191,7 @@ local function BuildUI(title)
 		BorderSizePixel = 0,
 		ClipsDescendants = true,
 	}, UI)
-	addCorner(Main, 15)
+	addCorner(Main, 10)
 	addStroke(Main, Color3.fromRGB(220, 220, 230), 1.5, 0.2)
 
 	local SizeConstraint = create("UISizeConstraint", {
@@ -205,6 +205,8 @@ local function BuildUI(title)
 		BackgroundColor3 = Color3.fromRGB(25, 25, 30),
 		BorderSizePixel = 0,
 	}, Main)
+addCorner(Topbar, 10)
+
 
 	local TitleLabel = create("TextLabel", {
 		Name = "Title",
@@ -254,6 +256,7 @@ local function BuildUI(title)
 		Size = UDim2.new(1, 0, 1, -42),
 		BackgroundTransparency = 1,
 	}, Main)
+addCorner(Body, 10)
 
 	local Sidebar = create("ScrollingFrame", {
 		Name = "Sidebar",
@@ -267,6 +270,8 @@ local function BuildUI(title)
 		ScrollingDirection = Enum.ScrollingDirection.Y,
 	}, Body)
 	addPadding(Sidebar, 7, 7, 8, 8)
+addCorner(Sidebar, 10)
+
 
 	create("UIListLayout", {
 		Name = "TabListLayout",
