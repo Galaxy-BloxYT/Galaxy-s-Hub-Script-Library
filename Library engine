@@ -1411,6 +1411,7 @@ local function getHardwareID()
 	end)
 	return hwid
 end
+
 function Library.Construct(customConfig)
 	if type(customConfig) == "table" and customConfig.UseKeySystem then
 		local config = {
@@ -1421,7 +1422,7 @@ function Library.Construct(customConfig)
 			MaxKeyUsesPerDay = customConfig.MaxKeyUsesPerDay or 50,
 			Whitelist = customConfig.Whitelist or {},
 			KeySystemTitle = customConfig.KeySystemTitle or "Key System",
-			LibraryTitle = customConfig.LibraryTitle or "Galaxy's Hub"
+			WindowTitle = customConfig.WindowTitle or "Galaxy's Hub"
 		}
 
 		local function isWhitelisted()
@@ -1458,7 +1459,8 @@ function Library.Construct(customConfig)
 			end)
 			return true, ""
 		end
-local function validateKey(inputKey)
+
+		local function validateKey(inputKey)
 			local targetKey = (config.KeyType == "Static") and config.StaticKey or getDynamicKey()
 			if inputKey ~= targetKey then return false, "Incorrect Key!" end
 			return checkAndUpdateKeyUsage(inputKey)
@@ -1517,28 +1519,28 @@ local function validateKey(inputKey)
 				Size = UDim2.new(1, -40, 0, 34),
 				Position = UDim2.new(0, 20, 0, 105),
 				BackgroundColor3 = Color3.fromRGB(114, 9, 183),
-				Text = "Check Key",
+				Text = "Check Key System",
 				TextColor3 = Color3.fromRGB(255, 255, 255),
 				TextSize = 13,
 				Font = Enum.Font.GothamBold,
 			}, Frame)
 			addCorner(SubmitBtn, 6)
 
-SubmitBtn.MouseButton1Click:Connect(function()
+			SubmitBtn.MouseButton1Click:Connect(function()
 				local valid, msg = validateKey(TextBox.Text)
 				if valid then
 					KeyGui:Destroy()
 					keyVerified = true
 				else
 					SubmitBtn.Text = msg
-					task.delay(2, function() SubmitBtn.Text = "Check Key" end)
+					task.delay(2, function() SubmitBtn.Text = "Check Key System" end)
 				end
 			end)
 
 			repeat task.wait(0.1) until keyVerified
 		end
 
-		return BuildUI(config.LibraryTitle)
+		return BuildUI(config.WindowTitle)
 	else
 		return BuildUI(type(customConfig) == "string" and customConfig or "Galaxy's Hub")
 	end
