@@ -946,7 +946,7 @@ function Library:InitKeySystem(config)
         return success and hwid or tostring(Player.UserId)
     end
 
-    local function GenerateKey()
+        local function GenerateKey()
         if KeyType == "Static" then
             return StaticKeyBase .. GetHWID()
         else
@@ -956,10 +956,11 @@ function Library:InitKeySystem(config)
             for i = 1, 16 do
                 local rand = math.random(1, #chars)
                 key = key .. chars:sub(rand, rand)
-            }
+            end
             return "GALAXY-" .. key
         end
     end
+
 
     local CurrentGeneratedKey = GenerateKey()
 
