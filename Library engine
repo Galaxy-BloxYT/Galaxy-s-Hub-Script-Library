@@ -285,26 +285,20 @@ local function BuildUI(title)
 
 	makeDraggable(TopBar, Main)
 
+local DragHitbox = create("Frame", {
+		Name = "DragHitbox",
+		Size = UDim2.new(1, 10, 1, 10),      
+		Position = UDim2.fromOffset(-5, -5),  
+		BackgroundTransparency = 1,           
+		Active = true,                        
+		ZIndex = 999,                         
+	}, Main)
+if type(makeDraggable) == "function" then
+    makeDraggable(DragHitbox, Main)
+end
+
 	local minimized = false
    local originalSize = Main.Size
-
-local DragBar = Instance.new("TextButton")
-DragBar.Name = "DragBar"
-DragBar.Size = UDim2.new(1, 0, 0, 24)
-DragBar.Position = UDim2.new(0, 0, 1, -24)
-DragBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-DragBar.BackgroundTransparency = 0.4
-DragBar.Text = "— Drag —"
-DragBar.TextColor3 = Color3.fromRGB(180, 180, 180)
-DragBar.TextSize = 12
-DragBar.Font = Enum.Font.SourceSansBold
-DragBar.AutoButtonColor = false
-DragBar.Visible = false
-DragBar.Parent = Main
-
-if type(makeDraggable) == "function" then
-    makeDraggable(DragBar, Main)
-end
 
 
 MinimizeButton.MouseButton1Click:Connect(function()
@@ -320,9 +314,9 @@ MinimizeButton.MouseButton1Click:Connect(function()
         end
         
         Main.Size = UDim2.new(originalSize.X.Scale, originalSize.X.Offset, 0, 42)
-        DragBar.Visible = true
+        DragHitbox.Visible = false
     else
-        DragBar.Visible = false
+        DragHitbox.Visible = true
         Body.Visible = true
         MinimizeButton.Text = "-"
         
