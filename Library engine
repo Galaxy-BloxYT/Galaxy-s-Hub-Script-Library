@@ -1400,30 +1400,7 @@ local HueCursor = create("Frame", {
 			return controller
 		end
 
-
-        
-
-            local Library = {}
-Library.__index = Library
-
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local HttpService = game:GetService("HttpService")
-local CoreGui = game:GetService("CoreGui")
-
-local function getHardwareID()
-    local hwid = "UnknownHWID"
-    pcall(function()
-        if gethwid then
-            hwid = gethwid()
-        else
-            hwid = game:GetService("RbxAnalyticsService"):GetClientId()
-        end
-    end)
-    return hwid
-end
-
-function Library.Construct(customConfig, windowTitle)
+function Library.Construct(customConfig)
     if type(customConfig) == "table" and customConfig.UseKeySystem then
         local config = {
             KeyType = customConfig.KeyType or "Dynamic",
@@ -1431,7 +1408,9 @@ function Library.Construct(customConfig, windowTitle)
             UseLocalFile = customConfig.UseLocalFile ~= nil and customConfig.UseLocalFile or true,
             FileName = customConfig.FileName or "GalaxysHubLibCustomKey.string",
             MaxKeyUsesPerDay = customConfig.MaxKeyUsesPerDay or 50,
-            Whitelist = customConfig.Whitelist or {}
+            Whitelist = customConfig.Whitelist or {},
+            KeySystemTitle = customConfig.KeySystemTitle or "Key System",
+            LibraryTitle = customConfig.LibraryTitle or "Galaxy's Hub"
         }
 
         local function isWhitelisted()
@@ -1520,7 +1499,7 @@ function Library.Construct(customConfig, windowTitle)
             Title.Size = UDim2.new(1, 0, 0, 40)
             Title.Position = UDim2.new(0, 0, 0, 10)
             Title.BackgroundTransparency = 1
-            Title.Text = windowTitle or "Key System"
+            Title.Text = config.KeySystemTitle
             Title.TextColor3 = Color3.fromRGB(255, 255, 255)
             Title.TextSize = 14
             Title.Font = Enum.Font.GothamBold
@@ -1602,8 +1581,6 @@ function Library.Construct(customConfig, windowTitle)
     local self = setmetatable({}, Library)
     return self
 end
-
-
 
     		if not self._currentTab then
 			self:SelectTab(TabObj)
