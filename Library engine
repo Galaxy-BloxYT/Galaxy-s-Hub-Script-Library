@@ -159,7 +159,7 @@ local function BuildUI(title)
 	end
 
 	local UI = create("ScreenGui", {
-		Name = "GSHUBLIB",
+		Name = "jshshe8ub28d82UEG7DE77AYY77yy72jhgs7UuUuYUYI8YGJJGFIJFR", -- tried to bypass some CoreGUI protections by doing this :)
 		ResetOnSpawn = false,
 		IgnoreGuiInset = false,
 		ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
@@ -191,7 +191,7 @@ local function BuildUI(title)
 		BorderSizePixel = 0,
 		ClipsDescendants = true,
 	}, UI)
-	addCorner(Main, 10)
+	addCorner(Main, 15)
 	addStroke(Main, Color3.fromRGB(220, 220, 230), 1.5, 0.2)
 
 	local SizeConstraint = create("UISizeConstraint", {
