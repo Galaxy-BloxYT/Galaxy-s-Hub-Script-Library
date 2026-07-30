@@ -900,6 +900,221 @@ BackgroundTransparency = 1,
 			return TextBox
 		end
 
+local function getGuiParent()
+    if gethui then
+        return gethui()
+    elseif syn and syn.protect_gui then
+        local gui = Instance.new("Folder")
+        syn.protect_gui(gui)
+        gui.Parent = CoreGui
+        return gui
+    else
+        return CoreGui
+    end
+end
+
+
+function Library:InitKeySystem(config)
+    config = config or {}
+    
+    
+    if config.UseKeySystem == false then
+        return true
+    end
+
+    
+    if config.Whitelist and type(config.Whitelist) == "table" then
+        local userId = Player.UserId
+        local success, hwid = pcall(function() return gethwid and gethwid() end)
+        
+        for _, id in ipairs(config.Whitelist) do
+            if id == userId or (success and id == hwid) then
+                return true -- Tá na whitelist? Passa direto sem chave!
+            end
+        end
+    end
+
+    local KeySystemTitle = config.KeySystemTitle or "My Incredible Hub! | Key System"
+    local KeyType = config.KeyType or "Dynamic"
+    local FileName = config.FileName or "GalaxysHubLib_Key.string"
+    local StaticKeyBase = config.StaticKeyBase or "KEY-"
+
+    local function GetHWID()
+        local success, hwid = pcall(function()
+            return gethwid and gethwid() or tostring(Player.UserId)
+        end)
+        return success and hwid or tostring(Player.UserId)
+    end
+
+    local function GenerateKey()
+        if KeyType == "Static" then
+            return StaticKeyBase .. GetHWID()
+        else
+            local chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            local key = ""
+            math.randomseed(os.time())
+            for i = 1, 16 do
+                local rand = math.random(1, #chars)
+                key = key .. chars:sub(rand, rand)
+            }
+            return "GALAXY-" .. key
+        end
+    end
+
+    local CurrentGeneratedKey = GenerateKey()
+
+    local function SaveKey(val)
+        pcall(function() writefile(FileName, val) end)
+    end
+
+    local function ReadKey()
+        local success, data = pcall(function()
+            if isfile and isfile(FileName) then return readfile(FileName) end
+        end)
+        return success and data or nil
+    end
+
+    local savedKey = ReadKey()
+
+    if savedKey == CurrentGeneratedKey then
+        return true
+    end
+
+    local parentGui = getGuiParent()
+    if parentGui:FindFirstChild("GalaxyKeySystem") then
+        parentGui.GalaxyKeySystem:Destroy()
+    end
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "GalaxyKeySystem"
+    ScreenGui.Parent = parentGui
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.DisplayOrder = 999999
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Parent = ScreenGui
+    MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 22)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Position = UDim2.new(0.5, -200, 0.5, -130)
+    MainFrame.Size = UDim2.new(0, 400, 0, 260)
+
+    addCorner(MainFrame, 10)
+    addStroke(MainFrame)
+
+    local TitleLabel = Instance.new("TextLabel")
+    TitleLabel.Parent = MainFrame
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Position = UDim2.new(0, 0, 0, 15)
+    TitleLabel.Size = UDim2.new(1, 0, 0, 30)
+    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.Text = KeySystemTitle
+    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TitleLabel.TextSize = 16
+
+    local SubTitle = Instance.new("TextLabel")
+    SubTitle.Parent = MainFrame
+    SubTitle.BackgroundTransparency = 1
+    SubTitle.Position = UDim2.new(0, 0, 0, 38)
+    SubTitle.Size = UDim2.new(1, 0, 0, 20)
+    SubTitle.Font = Enum.Font.Gotham
+    SubTitle.Text = "Input your key to continue..."
+    SubTitle.TextColor3 = Color3.fromRGB(130, 130, 160)
+    SubTitle.TextSize = 12
+
+    local KeyBox = Instance.new("TextBox")
+    KeyBox.Parent = MainFrame
+    KeyBox.BackgroundColor3 = Color3.fromRGB(22, 22, 32)
+    KeyBox.Position = UDim2.new(0.1, 0, 0, 75)
+    KeyBox.Size = UDim2.new(0.8, 0, 0, 45)
+    KeyBox.ClearTextOnFocus = false
+    KeyBox.Font = Enum.Font.Code
+    KeyBox.PlaceholderText = "Key here..."
+    KeyBox.PlaceholderColor3 = Color3.fromRGB(80, 80, 110)
+    KeyBox.Text = savedKey or ""
+    KeyBox.TextColor3 = Color3.fromRGB(0, 242, 255)
+    KeyBox.TextSize = 14
+
+    addCorner(KeyBox, 6)
+    addStroke(KeyBox)
+
+    local CheckBtn = Instance.new("TextButton")
+    CheckBtn.Parent = MainFrame
+    CheckBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 255)
+    CheckBtn.Position = UDim2.new(0.1, 0, 0, 135)
+    CheckBtn.Size = UDim2.new(0.38, 0, 0, 40)
+    CheckBtn.Font = Enum.Font.GothamBold
+    CheckBtn.Text = "CHECK KEY"
+    CheckBtn.TextColor3 = Color3.fromRGB(15, 15, 22)
+    CheckBtn.TextSize = 13
+
+    local CheckCorner = Instance.new("UICorner")
+    CheckCorner.CornerRadius = UDim.new(0, 6)
+    CheckCorner.Parent = CheckBtn
+
+    local GetKeyBtn = Instance.new("TextButton")
+    GetKeyBtn.Parent = MainFrame
+    GetKeyBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 38)
+    GetKeyBtn.Position = UDim2.new(0.52, 0, 0, 135)
+    GetKeyBtn.Size = UDim2.new(0.38, 0, 0, 40)
+    GetKeyBtn.Font = Enum.Font.GothamBold
+    GetKeyBtn.Text = "GET KEY"
+    GetKeyBtn.TextColor3 = Color3.fromRGB(0, 242, 255)
+    GetKeyBtn.TextSize = 13
+    addStroke(GetKeyBtn)
+    addCorner(GetKeyBtn)
+
+    local StatusLabel = Instance.new("TextLabel")
+    StatusLabel.Parent = MainFrame
+    StatusLabel.BackgroundTransparency = 1
+    StatusLabel.Position = UDim2.new(0, 0, 0, 195)
+    StatusLabel.Size = UDim2.new(1, 0, 0, 30)
+    StatusLabel.Font = Enum.Font.Gotham
+    StatusLabel.Text = ""
+    StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    StatusLabel.TextSize = 12
+
+    local isVerified = false
+
+    CheckBtn.MouseButton1Click:Connect(function()
+        if KeyBox.Text == CurrentGeneratedKey then
+            StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 120)
+            StatusLabel.Text = "Valid Key!"
+            SaveKey(KeyBox.Text)
+            task.wait(1)
+            ScreenGui:Destroy()
+            isVerified = true
+        else
+            StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+            StatusLabel.Text = "Error: Incorrect key or key is expired!"
+        end
+    end)
+
+    local isGenerating = false
+    GetKeyBtn.MouseButton1Click:Connect(function()
+        if isGenerating then return end
+        isGenerating = true
+        local countdown = 10
+        GetKeyBtn.Active = false
+        
+        while countdown > 0 do
+            StatusLabel.TextColor3 = Color3.fromRGB(0, 242, 255)
+            StatusLabel.Text = "Aguarde o Captcha... (" .. countdown .. "s)"
+            task.wait(1)
+            countdown = countdown - 1
+        end
+        
+        KeyBox.Text = CurrentGeneratedKey
+        SaveKey(CurrentGeneratedKey)
+        StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 120)
+        StatusLabel.Text = "Key gerada e salva com sucesso!"
+        GetKeyBtn.Active = true
+        isGenerating = false
+    end)
+
+    repeat task.wait() until isVerified
+    return true
+end
+
        			function TabObj:AddDropdown(text, options, defaultOption, isMultiple, callback)
 			options = options or {}
 			local multiple = isMultiple or false
