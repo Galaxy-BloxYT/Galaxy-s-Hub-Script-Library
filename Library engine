@@ -6,6 +6,7 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
 local HttpService = game:GetService("HttpService")
 
 local function _T(value)
@@ -899,11 +900,6 @@ BackgroundTransparency = 1,
 
 			return TextBox
 		end
-
-local Library = {}
-local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")
-local Player = Players.LocalPlayer
 
 local function getGuiParent()
     if gethui then
