@@ -1400,17 +1400,18 @@ local HueCursor = create("Frame", {
 			return controller
 		end
 
-    
-    local Library = {}
+
+        
+
+            local Library = {}
 Library.__index = Library
 
--- Variáveis de serviços necessárias
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
 
-local function getHWID()
+local function getHardwareID()
     local hwid = "UnknownHWID"
     pcall(function()
         if gethwid then
@@ -1422,9 +1423,7 @@ local function getHWID()
     return hwid
 end
 
--- A função Construct agora assume TUDO: Key System + Criação da Janela
 function Library.Construct(customConfig, windowTitle)
-    -- Se o usuário passou as configurações de Key System, valida antes de abrir a UI
     if type(customConfig) == "table" and customConfig.UseKeySystem then
         local config = {
             KeyType = customConfig.KeyType or "Dynamic",
@@ -1444,7 +1443,7 @@ function Library.Construct(customConfig, windowTitle)
 
         local function getDynamicKey()
             local currentDate = os.date("%d%m%Y")
-            local cleanHwid = string.sub(string.gsub(getHWID(), "[^%w]", ""), 1, 6):upper()
+            local cleanHwid = string.sub(string.gsub(getHardwareID(), "[^%w]", ""), 1, 6):upper()
             return "KEY-" .. cleanHwid .. "-" .. currentDate
         end
 
@@ -1599,11 +1598,12 @@ function Library.Construct(customConfig, windowTitle)
             repeat task.wait(0.1) until keyVerified
         end
     end
+    
     local self = setmetatable({}, Library)
-    
-    
     return self
 end
+
+
 
     		if not self._currentTab then
 			self:SelectTab(TabObj)
