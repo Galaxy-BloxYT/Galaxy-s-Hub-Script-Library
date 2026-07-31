@@ -1644,3 +1644,5 @@ Library.Construct = BuildUI
 Library.CreateWindow = BuildUI
 
 return Library
+
+print("DOCUMENTATION: https://galaxyshubdocumentation.netlify.app/")
