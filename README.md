@@ -1,4 +1,4 @@
-just a script library for roblox exploits, made for fun. Discord: https://discord.gg/s3KtEpPAGT
+just a script library for roblox exploits, made for fun. Discord: https://discord.gg/43gMkGuea8
 
 # Privacy Policy & Terms of Service
 
